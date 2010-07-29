@@ -40,11 +40,12 @@ class MondongoAutoload
     'MondongoDefinitionDocument'      => '/definition/MondongoDefinitionDocument.php',
     'MondongoDefinitionDocumentEmbed' => '/definition/MondongoDefinitionDocumentEmbed.php',
     // document
-    'MondongoDocument'          => '/document/MondongoDocument.php',
-    'MondongoDocumentBase'      => '/document/MondongoDocumentBase.php',
-    'MondongoDocumentBaseSpeed' => '/document/MondongoDocumentBaseSpeed.php',
-    'MondongoDocumentEmbed'     => '/document/MondongoDocumentEmbed.php',
-    'MondongoDocumentSpeed'     => '/document/MondongoDocumentSpeed.php',
+    'MondongoDocument'           => '/document/MondongoDocument.php',
+    'MondongoDocumentBase'       => '/document/MondongoDocumentBase.php',
+    'MondongoDocumentBaseSpeed'  => '/document/MondongoDocumentBaseSpeed.php',
+    'MondongoDocumentEmbed'      => '/document/MondongoDocumentEmbed.php',
+    'MondongoDocumentEmbedSpeed' => '/document/MondongoDocumentEmbedSpeed.php',
+    'MondongoDocumentSpeed'      => '/document/MondongoDocumentSpeed.php',
     // extension
     'MondongoExtension' => '/extension/MondongoExtension.php',
     // group
