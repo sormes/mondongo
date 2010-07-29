@@ -267,8 +267,6 @@ class MondongoRepository
     $inserts = array();
     $updates = array();
 
-    $docs = array();
-
     foreach ($documents as $document)
     {
       if (!$document->isModified())
@@ -278,12 +276,7 @@ class MondongoRepository
 
       if ($document->isNew())
       {
-        $oid  = spl_object_hash($document);
-        $data = $document->getQueryForSave();
-
-        $docs[$oid] = $document;
-
-        $inserts[$oid] = $data;
+        $inserts[spl_object_hash($document)] = $document;
       }
       else
       {
@@ -296,24 +289,30 @@ class MondongoRepository
       if ($inserts)
       {
         // preInsert
-        $this->notifyEvent($docs, $events, $extensions, 'preInsert');
+        $this->notifyEvent($inserts, $events, $extensions, 'preInsert');
 
         // preSave
-        $this->notifyEvent($docs, $events, $extensions, 'preSave');
+        $this->notifyEvent($inserts, $events, $extensions, 'preSave');
 
-        $this->collection->batchInsert($inserts);
-
-        foreach ($inserts as $oid => $data)
+        $data = array();
+        foreach ($inserts as $oid => $document)
         {
-          $docs[$oid]->setId($data['_id']);
-          $docs[$oid]->clearModified();
+          $data[$oid] = $document->getQueryForSave();
+        }
+
+        $this->collection->batchInsert($data);
+
+        foreach ($data as $oid => $datum)
+        {
+          $inserts[$oid]->setId($datum['_id']);
+          $inserts[$oid]->clearModified();
         }
 
         // postInsert
-        $this->notifyEvent($docs, $events, $extensions, 'postInsert');
+        $this->notifyEvent($inserts, $events, $extensions, 'postInsert');
 
         // postSave
-        $this->notifyEvent($docs, $events, $extensions, 'postSave');
+        $this->notifyEvent($inserts, $events, $extensions, 'postSave');
       }
 
       if ($updates)
