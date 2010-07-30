@@ -131,6 +131,11 @@ class MondongoContainer
     return self::$definitions[$name];
   }
 
+  static public function getDefinitions()
+  {
+    return self::$definitions;
+  }
+
   static public function clearDefinitions()
   {
     self::$definitions = array();

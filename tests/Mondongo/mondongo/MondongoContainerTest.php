@@ -84,7 +84,7 @@ class MondongoContainerTest extends MondongoTestCase
 
   public function testDefinitions()
   {
-    $definition = MondongoContainer::getDefinition('MondongoDocumentTesting');
+    $definition1 = $definition = MondongoContainer::getDefinition('MondongoDocumentTesting');
 
     $this->assertTrue(is_object($definition));
     $this->assertEquals('MondongoDefinitionDocument', get_class($definition));
@@ -93,12 +93,21 @@ class MondongoContainerTest extends MondongoTestCase
     $this->assertTrue($definition->isClosed());
     $this->assertSame($definition, MondongoContainer::getDefinition('MondongoDocumentTesting'));
 
-    $definition = MondongoContainer::getDefinition('Source');
+    $definition2 = $definition = MondongoContainer::getDefinition('Source');
 
     $this->assertTrue(is_object($definition));
     $this->assertEquals('MondongoDefinitionDocumentEmbed', get_class($definition));
     $this->assertSame('Source', $definition->getName());
     $this->assertTrue($definition->hasField('title'));
     $this->assertSame($definition, MondongoContainer::getDefinition('Source'));
+
+    $this->assertSame(array(
+      'MondongoDocumentTesting' => $definition1,
+      'Source'                  => $definition2,
+    ), MondongoContainer::getDefinitions());
+
+    MondongoContainer::clearDefinitions();
+
+    $this->assertSame(array(), MondongoContainer::getDefinitions());
   }
 }
