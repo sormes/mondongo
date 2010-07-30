@@ -32,13 +32,11 @@ abstract class MondongoDocumentBase extends MondongoDocumentBaseSpeed implements
    */
   public function __construct()
   {
-    $this->name = get_class($this);
-
     // PERFORMANCE
     /*
     $definition = $this->getDefinition();
     */
-    $definition = MondongoContainer::getDefinition($this->name);
+    $definition = MondongoContainer::getDefinition(get_class($this));
 
     $this->data           = $definition->getDefaultData();
     $this->fieldsModified = $definition->getDefaultFieldsModified();

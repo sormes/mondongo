@@ -31,8 +31,6 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
 
   static protected $getters = array();
 
-  protected $name;
-
   protected $data = array();
 
   protected $fieldsModified = array();
@@ -110,22 +108,24 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
    */
   public function set($name, $value)
   {
-    if (!isset(self::$setters[$this->name]))
+    $class = get_class($this);
+
+    if (!isset(self::$setters[$class]))
     {
-      self::$setters[$this->name] = array();
+      self::$setters[$class] = array();
 
       foreach (array_keys($this->getDefinition()->getFields()) as $fieldName)
       {
         if (method_exists($this, $method = 'set'.MondongoInflector::camelize($fieldName)))
         {
-          self::$setters[$this->name][$fieldName] = $method;
+          self::$setters[$class][$fieldName] = $method;
         }
       }
     }
 
-    if (isset(self::$setters[$this->name][$name]))
+    if (isset(self::$setters[$class][$name]))
     {
-      $method = self::$setters[$this->name][$name];
+      $method = self::$setters[$class][$name];
 
       return $this->$method($value);
     }
@@ -135,22 +135,24 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
 
   public function get($name)
   {
-    if (!isset(self::$getters[$this->name]))
+    $class = get_class($this);
+
+    if (!isset(self::$getters[$class]))
     {
-      self::$getters[$this->name] = array();
+      self::$getters[$class] = array();
 
       foreach (array_keys($this->getDefinition()->getFields()) as $fieldName)
       {
         if (method_exists($this, $method = 'get'.MondongoInflector::camelize($fieldName)))
         {
-          self::$getters[$this->name][$fieldName] = $method;
+          self::$getters[$class][$fieldName] = $method;
         }
       }
     }
 
-    if (isset(self::$getters[$this->name][$name]))
+    if (isset(self::$getters[$class][$name]))
     {
-      $method = self::$getters[$this->name][$name];
+      $method = self::$getters[$class][$name];
 
       return $this->$method();
     }
