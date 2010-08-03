@@ -27,7 +27,7 @@
  */
 class Mondongo
 {
-  const VERSION = '0.8-DEV';
+  const VERSION = '0.9.0';
 
   protected $connections = array();
 
