@@ -23,14 +23,16 @@ $context = array(
   'api_stability' => $argv[2],
 );
 
-$context['files'] = "\n";
+$context['files']    = "\n";
+$context['filelist'] = "\n";
 $path = realpath(dirname(__FILE__).'/../lib');
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::LEAVES_ONLY) as $file)
 {
   if (preg_match('/\.php$/', $file))
   {
-    $name = str_replace($path.'/', '', $file);
-    $context['files'] .= '    <file name="'.$name.'" role="php" />'."\n";
+    $name = 'lib/'.str_replace($path.'/', '', $file);
+    $context['files']    .= '    <file baseinstalldir="Mondongo" name="'.$name.'" role="php" />'."\n";
+    $context['filelist'] .= '    <install as="'.str_replace('lib/', '', $name).'" name="'.$name.'" />'."\n";
   }
 }
 

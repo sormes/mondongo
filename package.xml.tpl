@@ -34,9 +34,7 @@
   <dir name="/">
    <file name="LICENSE" role="doc" />
    <file name="README.markdown" role="doc" />
-   <dir name="lib">
     ##FILES##
-   </dir>
   </dir>
  </contents>
 
@@ -52,6 +50,9 @@
  </dependencies>
 
  <phprelease>
+  <filelist>
+    ##FILELIST##
+  </filelist>
  </phprelease>
 
 </package>
