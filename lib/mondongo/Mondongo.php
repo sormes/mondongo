@@ -39,8 +39,12 @@ class Mondongo
 
   protected $logCallable;
 
-  /*
-   * Connections.
+  /**
+   * Set the connections.
+   *
+   * @param array $connections An array of connections.
+   *
+   * @return void
    */
   public function setConnections(array $connections)
   {
@@ -51,11 +55,26 @@ class Mondongo
     }
   }
 
+  /**
+   * Set a connection.
+   *
+   * @param string             $name       The connection name.
+   * @param MondongoConnection $connection The connection.
+   *
+   * @return void
+   */
   public function setConnection($name, MondongoConnection $connection)
   {
     $this->connections[$name] = $connection;
   }
 
+  /**
+   * Remove a connection.
+   *
+   * @param string $name The connection name.
+   *
+   * @return void
+   */
   public function removeConnection($name)
   {
     $this->checkConnection($name);
@@ -63,16 +82,37 @@ class Mondongo
     unset($this->connections[$name]);
   }
 
+  /**
+   * Clear the connections.
+   *
+   * @return void
+   */
   public function clearConnections()
   {
     $this->connections = array();
   }
 
+  /**
+   * Returns if a connection exists.
+   *
+   * @param string $name The connection name.
+   *
+   * @return boolean Returns if a connection exists.
+   */
   public function hasConnection($name)
   {
     return isset($this->connections[$name]);
   }
 
+  /**
+   * Return a connection.
+   *
+   * @param string $name The connection name.
+   *
+   * @return MondongoConnection The connection.
+   *
+   * @throws InvalidArgumentException If the connection does not exists.
+   */
   public function getConnection($name)
   {
     $this->checkConnection($name);
@@ -80,21 +120,46 @@ class Mondongo
     return $this->connections[$name];
   }
 
+  /**
+   * Returns the connections.
+   *
+   * @return array The array of connections.
+   */
   public function getConnections()
   {
     return $this->connections;
   }
 
+  /**
+   * Set the default connection name.
+   *
+   * @param string $name The connection name.
+   *
+   * @return void
+   */
   public function setDefaultConnectionName($name)
   {
     $this->defaultConnectionName = $name;
   }
 
+  /**
+   * Returns the default connection name.
+   *
+   * @return string The default connection name.
+   */
   public function getDefaultConnectionName()
   {
     return $this->defaultConnectionName;
   }
 
+  /**
+   * Returns the default connection.
+   *
+   * @return MondongoConnection The default connection.
+   *
+   * @throws RuntimeException If the default connection does not exists.
+   * @throws RuntimeException If there is not connections.
+   */
   public function getDefaultConnection()
   {
     if (null !== $this->defaultConnectionName)
@@ -114,6 +179,13 @@ class Mondongo
     return $connection;
   }
 
+  /**
+   * Check that a connection exists.
+   *
+   * @param string $name The connection name.
+   *
+   * @throws InvalidArgumentException If the connection does not exists.
+   */
   protected function checkConnection($name)
   {
     if (!$this->hasConnection($name))
@@ -122,8 +194,12 @@ class Mondongo
     }
   }
 
-  /*
-   * Repositories.
+  /**
+   * Returns a repository.
+   *
+   * @param string $name The document name.
+   *
+   * @return MondongoRepository The repository.
    */
   public function getRepository($name)
   {
@@ -145,8 +221,12 @@ class Mondongo
     return $this->repositories[$name];
   }
 
-  /*
-   * logCallable.
+  /**
+   * Set the log callable.
+   *
+   * @param mixed $logCallable The log callable.
+   *
+   * @return void
    */
   public function setLogCallable($logCallable)
   {
@@ -158,39 +238,77 @@ class Mondongo
     }
   }
 
+  /**
+   * Returns the log callable.
+   *
+   * @return mixed The log callable.
+   */
   public function getLogCallable()
   {
     return $this->logCallable;
   }
 
-  /*
-   * Find.
+  /**
+   * Find documents.
+   *
+   * @param string $name    The document name.
+   * @param array  $query   The query.
+   * @param array  $options An array of options.
+   *
+   * @return mixed The documents found within the parameters.
    */
   public function find($name, $query = array(), $options = array())
   {
     return $this->getRepository($name)->find($query, $options);
   }
 
+  /**
+   * Find one document.
+   *
+   * @param string $name    The document name.
+   * @param array  $query   The query.
+   * @param array  $options An array of options.
+   *
+   * @return mixed The document found within the parameters.
+   */
   public function findOne($name, $query = array(), $options = array())
   {
     return $this->getRepository($name)->findOne($query, $options);
   }
 
+  /**
+   * Find a document by id.
+   *
+   * @param string $name The document name.
+   * @param mixed  $id   The document id (string or MongoId object).
+   *
+   * @return mixed The document or NULL if it does not exists.
+   */
   public function get($name, $id)
   {
     return $this->getRepository($name)->get($id);
   }
 
-  /*
-   * Save.
+  /**
+   * Save documents.
+   *
+   * @param string $name      The document name.
+   * @param array  $documents An array of documents.
+   *
+   * @return void
    */
   public function save($name, $documents)
   {
     $this->getRepository($name)->save($documents);
   }
 
-  /*
-   * Delete.
+  /**
+   * Delete documents.
+   *
+   * @param string $name      The document name.
+   * @param array  $documents An array of documents.
+   *
+   * @return void
    */
   public function delete($name, $documents)
   {

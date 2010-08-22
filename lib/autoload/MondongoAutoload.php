@@ -20,7 +20,7 @@
  */
 
 /**
- * Autoload.
+ * The Mondongo Autoload.
  *
  * @package Mondongo
  * @author  Pablo Díez Pascual <pablodip@gmail.com>
@@ -73,6 +73,13 @@ class MondongoAutoload
     'MondongoInflector' => '/util/MondongoInflector.php',
   );
 
+  /**
+   * Register the Mondongo Autoload in spl autoloader.
+   *
+   * @return void
+   *
+   * @throws RuntimeException If fail
+   */
   static public function register()
   {
     if (self::$registered)
@@ -88,12 +95,24 @@ class MondongoAutoload
     self::$registered = true;
   }
 
+  /**
+   * Unregister the Mondongo Autoload from spl autoloader.
+   *
+   * @return void
+   */
   static public function unregister()
   {
     spl_autoload_register(array('MondongoAutoload', 'autoload'));
     self::$registered = false;
   }
 
+  /**
+   * Autoload a Mondongo class.
+   *
+   * @param string $class A class name.
+   *
+   * @return boolean Return TRUE if the class has ben loaded.
+   */
   static public function autoload($class)
   {
     if (isset(self::$classes[$class]))

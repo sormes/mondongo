@@ -45,16 +45,24 @@ abstract class MondongoDefinition
 
   protected $closureToPHP;
 
-  /*
+  /**
    * Constructor.
+   *
+   * @param string $name The name (class) of the document.
+   *
+   * @return void.
    */
   public function __construct($name)
   {
     $this->name = $name;
   }
 
-  /*
-   * Close.
+  /**
+   * Close the definition.
+   *
+   * @return void.
+   *
+   * @throws RuntimeException If the definition is closed.
    */
   public function close()
   {
@@ -65,6 +73,11 @@ abstract class MondongoDefinition
     $this->closed = true;
   }
 
+  /**
+   * Do the close process of the definition.
+   *
+   * @return void
+   */
   protected function doClose()
   {
     $this->defaultData           = $this->generateDefaultData();
@@ -74,11 +87,23 @@ abstract class MondongoDefinition
     $this->closureToPHP   = $this->generateClosureToPHP();
   }
 
+  /**
+   * Returns if the definition is closed.
+   *
+   * @return boolean Returns if the definition is closed.
+   */
   public function isClosed()
   {
     return $this->closed;
   }
 
+  /**
+   * Check if the definition is not closed.
+   *
+   * @return void
+   *
+   * @throws RuntimeException If the definition is not closed.
+   */
   protected function checkClosed()
   {
     if (!$this->closed)
@@ -87,6 +112,13 @@ abstract class MondongoDefinition
     }
   }
 
+  /**
+   * Check if the definition is closed.
+   *
+   * @return void
+   *
+   * @throws RuntimeException If the definition is closed.
+   */
   protected function checkNotClosed()
   {
     if ($this->closed)
@@ -95,8 +127,14 @@ abstract class MondongoDefinition
     }
   }
 
-  /*
-   * Name.
+  /**
+   * Set the name.
+   *
+   * @param string $name The name (class) of the document.
+   *
+   * @return void
+   *
+   * @throws RuntimeException If the definition is closed.
    */
   public function setName($name)
   {
@@ -105,13 +143,24 @@ abstract class MondongoDefinition
     $this->name = $name;
   }
 
+  /**
+   * Return the name.
+   *
+   * @return string The name.
+   */
   public function getName()
   {
     return $this->name;
   }
 
-  /*
-   * Fields.
+  /**
+   * Set the fields (reset).
+   *
+   * @param array $fields An array of fields.
+   *
+   * @return MondongoDefinition The current instance.
+   *
+   * @throws LogicException If some field name is busy.
    */
   public function setFields(array $fields)
   {
@@ -125,6 +174,14 @@ abstract class MondongoDefinition
     return $this;
   }
 
+  /**
+   * Set a field.
+   *
+   * @param string $name  The field name.
+   * @param mixed  $field The field definition.
+   *
+   * @return MondongoDefinition The current instance.
+   */
   public function setField($name, $field)
   {
     $this->checkName($name);
@@ -139,11 +196,27 @@ abstract class MondongoDefinition
     return $this;
   }
 
+  /**
+   * Returns if the field exists.
+   *
+   * @param string $name The field name.
+   *
+   * @return boolean Returns if the field exists.
+   */
   public function hasField($name)
   {
     return isset($this->fields[$name]);
   }
 
+  /**
+   * Return a field definition.
+   *
+   * @param string $name The field name.
+   *
+   * @return array The field definition.
+   *
+   * @throws InvalidArgumentException If the field does not exists.
+   */
   public function getField($name)
   {
     if (!$this->hasField($name))
@@ -154,13 +227,25 @@ abstract class MondongoDefinition
     return $this->fields[$name];
   }
 
+  /**
+   * Return the fields.
+   *
+   * @return array The fields.
+   */
   public function getFields()
   {
     return $this->fields;
   }
 
-  /*
-   * References.
+  /**
+   * Add a reference.
+   *
+   * @param string $name      The reference name.
+   * @param array  $reference The reference definition.
+   *
+   * @return MondongoDefinition The current instance.
+   *
+   * @throws LogicException If the reference name is busy.
    */
   public function reference($name, array $reference)
   {
@@ -171,11 +256,25 @@ abstract class MondongoDefinition
     return $this;
   }
 
+  /**
+   * Returns if the reference exists.
+   *
+   * @return boolean Returns if the reference exists.
+   */
   public function hasReference($name)
   {
     return isset($this->references[$name]);
   }
 
+  /**
+   * Return a reference definition.
+   *
+   * @param string $name The reference name.
+   *
+   * @return array The reference definition.
+   *
+   * @throws InvalidArgumentException If the reference does not exists.
+   */
   public function getReference($name)
   {
     if (!$this->hasReference($name))
@@ -186,19 +285,33 @@ abstract class MondongoDefinition
     return $this->references[$name];
   }
 
+  /**
+   * Return the references.
+   *
+   * @return array The references.
+   */
   public function getReferences()
   {
     return $this->references;
   }
 
   /*
-   * DefaultData.
+   * Return the default data.
+   *
+   * The default data is the default value of the data var of the documents.
+   *
+   * @return array The default data.
    */
   public function getDefaultData()
   {
     return $this->defaultData;
   }
 
+  /**
+   * Generate the default data.
+   *
+   * @return array The default data generated.
+   */
   protected function generateDefaultData()
   {
     $data = array();
@@ -220,14 +333,23 @@ abstract class MondongoDefinition
     return $data;
   }
 
-  /*
-   * DefaultFieldsModified.
+  /**
+   * Return the default fields modified.
+   *
+   * The default fields modified is the default value of the fieldsModified var of the documents.
+   *
+   * @return array The default fields modified.
    */
   public function getDefaultFieldsModified()
   {
     return $this->defaultFieldsModified;
   }
 
+  /**
+   * Generate the default fields modified.
+   *
+   * @return array The default fields modified.
+   */
   protected function generateDefaultFieldsModified()
   {
     $fieldsModified = array();
@@ -243,14 +365,23 @@ abstract class MondongoDefinition
     return $fieldsModified;
   }
 
-  /*
-   * ClosureToMongo.
+  /**
+   * Return the closure to Mongo.
+   *
+   * The closure to Mongo is the closure to convert the documents data for Mongo.
+   *
+   * @return Closure The closure to Mongo.
    */
   public function getClosureToMongo()
   {
     return $this->closureToMongo;
   }
 
+  /**
+   * Generate the closure to Mongo.
+   *
+   * @return Closure The closure to Mongo.
+   */
   protected function generateClosureToMongo()
   {
     $function = '';
@@ -293,13 +424,22 @@ EOF
   }
 
   /*
-   * ClosureToPHP.
+   * Return the closure to PHP.
+   *
+   * The closure to Mongo is the closure to convert the documents data for PHP.
+   *
+   * @return Closure The closure to PHP.
    */
   public function getClosureToPHP()
   {
     return $this->closureToPHP;
   }
 
+  /**
+   * Generate the closure to PHP.
+   *
+   * @return Closure The closure to PHP.
+   */
   protected function generateClosureToPHP()
   {
     $function = '';
@@ -383,8 +523,14 @@ EOF
     return $return;
   }
 
-  /*
-   * CheckName.
+  /**
+   * Check if a name is busy.
+   *
+   * @param string $name The name.
+   *
+   * @return void
+   *
+   * @throws LogicException If the name is busy.
    */
   protected function checkName($name)
   {
@@ -394,6 +540,13 @@ EOF
     }
   }
 
+  /**
+   * Returns if the name is busy.
+   *
+   * @param string $name The name.
+   *
+   * @return boolean Returns if the name is busy.
+   */
   protected function doCheckName($name)
   {
     return

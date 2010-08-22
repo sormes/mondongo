@@ -33,19 +33,35 @@ class MondongoContainer
 
   static protected $definitions = array();
 
-  /*
-   * Default
+  /**
+   * Set the default Mondongo.
+   *
+   * @param Mondongo $mondongo A Mondongo.
+   *
+   * @return void
    */
   static public function setDefault(Mondongo $mondongo)
   {
     self::$default = $mondongo;
   }
 
+  /**
+   * Returns if exists the default Mondongo.
+   *
+   * @return boolean If exists the default Mondongo.
+   */
   static public function hasDefault()
   {
     return null !== self::$default;
   }
 
+  /**
+   * Returns the default Mondongo.
+   *
+   * @return Mondongo The default Mondongo.
+   *
+   * @throws RuntimeException If the default Mondongo does not exists.
+   */
   static public function getDefault()
   {
     if (!self::hasDefault())
@@ -56,24 +72,50 @@ class MondongoContainer
     return self::$default;
   }
 
+  /**
+   * Clear the default Mondongo.
+   *
+   * @return void
+   */
   static public function clearDefault()
   {
     self::$default = null;
   }
 
-  /*
-   * Mondongos.
+  /**
+   * Set a Mondongo for a document name.
+   *
+   * @param string   $name     The document name.
+   * @param Mondongo $mondongo The Mondongo.
+   *
+   * @return void
    */
   static public function setForName($name, Mondongo $mondongo)
   {
     self::$mondongos[$name] = $mondongo;
   }
 
+  /**
+   * Returns if exists a Mondongo for a document name.
+   *
+   * @param string $name The document name.
+   *
+   * @return boolean Returns if exists the Mondongo.
+   */
   static public function hasForName($name)
   {
     return isset(self::$mondongos[$name]);
   }
 
+  /**
+   * Return the Mondongo for a document name.
+   *
+   * @param string $name The document name.
+   *
+   * @return Mondongo The Mondongo.
+   *
+   * @throws InvalidArgumentException If does not exists the Mondongo for the name and the default Mondongo.
+   */
   static public function getForName($name)
   {
     if (!isset(self::$mondongos[$name]))
@@ -89,6 +131,15 @@ class MondongoContainer
     return self::$mondongos[$name];
   }
 
+  /**
+   * Remove the Mondongo for a document name.
+   *
+   * @param string $name The document name.
+   *
+   * @return void
+   *
+   * @throws InvalidArgumentException If does not exists the Mondongo for the name.
+   */
   static public function removeForName($name)
   {
     if (!isset(self::$mondongos[$name]))
@@ -99,13 +150,22 @@ class MondongoContainer
     unset(self::$mondongos[$name]);
   }
 
+  /**
+   * Clear the Mondongos for the document names.
+   *
+   * @return void
+   */
   static public function clearForNames()
   {
     self::$mondongos = array();
   }
 
   /**
-   * Definitions.
+   * Returns a definition.
+   *
+   * @param string $name The document name.
+   *
+   * @return MondongoDefinition The definition.
    */
   static public function getDefinition($name)
   {
@@ -131,11 +191,21 @@ class MondongoContainer
     return self::$definitions[$name];
   }
 
+  /**
+   * Returns the definitions.
+   *
+   * @return array The definitions.
+   */
   static public function getDefinitions()
   {
     return self::$definitions;
   }
 
+  /**
+   * Clear the definitons.
+   *
+   * @return void
+   */
   static public function clearDefinitions()
   {
     self::$definitions = array();

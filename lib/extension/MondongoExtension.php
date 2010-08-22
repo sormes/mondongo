@@ -33,6 +33,16 @@ abstract class MondongoExtension
 
   protected $invoker;
 
+  /**
+   * Constructor.
+   *
+   * @param MondongoDefinitionDocument $definition A document definition.
+   * @param array                      $options    An array of options.
+   *
+   * @return void
+   *
+   * @throws RuntimeException If some option is not valid.
+   */
   public function __construct(MondongoDefinitionDocument $definition, array $options = array())
   {
     $this->definition = $definition;
@@ -47,20 +57,48 @@ abstract class MondongoExtension
     $this->setup($this->definition);
   }
 
+  /**
+   * The extension setup.
+   *
+   * @param MondongoDefinitionDocument $definition The definition.
+   *
+   * @return void
+   */
   protected function setup($definition)
   {
   }
 
+  /**
+   * Returns the definition.
+   *
+   * @return MondongoDefinitionDocument The definition.
+   */
   public function getDefinition()
   {
     return $this->definition;
   }
 
+  /**
+   * Returns if an option exists.
+   *
+   * @param string $name The option name.
+   *
+   * @return booelan Returns if the option exists.
+   */
   public function hasOption($name)
   {
     return array_key_exists($name, $this->options);
   }
 
+  /**
+   * Return an option value.
+   *
+   * @param string $name The option name.
+   *
+   * @return mixed The option value.
+   *
+   * @throws InvalidArgumentException If the option does not exists.
+   */
   public function getOption($name)
   {
     if (!$this->hasOption($name))
@@ -71,21 +109,43 @@ abstract class MondongoExtension
     return $this->options[$name];
   }
 
+  /**
+   * Return the options.
+   *
+   * @return array The options.
+   */
   public function getOptions()
   {
     return $this->options;
   }
 
+  /**
+   * Set the invoker.
+   *
+   * @param mixed $invoker The invoker.
+   *
+   * @return void
+   */
   public function setInvoker($invoker)
   {
     $this->invoker = $invoker;
   }
 
+  /**
+   * Returns the invoker.
+   *
+   * @return mixed The invoker.
+   */
   public function getInvoker()
   {
     return $this->invoker;
   }
 
+  /**
+   * Clear the invoker.
+   *
+   * @return void
+   */
   public function clearInvoker()
   {
     $this->invoker = null;

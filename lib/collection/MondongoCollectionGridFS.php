@@ -20,20 +20,45 @@
  */
 
 /**
- * Represents a Collection GridFS.
+ * Represents a GridFS Collection.
  *
  * @package Mondongo
  * @author  Pablo Díez Pascual <pablodip@gmail.com>
  */
 class MondongoCollectionGridFS extends MondongoCollection
 {
+  /**
+   * Constructor.
+   *
+   * @param MongoGridFS A MongoGridFS object.
+   *
+   * @return void
+   */
   public function __construct(MongoGridFS $mongoCollection)
   {
     $this->mongoCollection = $mongoCollection;
   }
 
+  /**
+   * @see MondongoCollection
+   */
+  public function batchInsert(&$a, $options = array())
+  {
+    foreach ($a as &$data)
+    {
+      $this->saveFile($data);
+    }
+  }
+
   /*
-   * SaveFile.
+   * Save a document with file.
+   *
+   * Based on DoctrineMongo save file:
+   * http://github.com/doctrine/mongodb-odm/blob/master/lib/Doctrine/ODM/MongoDB/MongoCollection.php
+   *
+   * @param array $a The document data.
+   *
+   * @return array The document with the file.
    */
   public function saveFile(&$a)
   {
@@ -81,16 +106,5 @@ class MondongoCollectionGridFS extends MondongoCollection
 
     $a = $file->file;
     $a['file'] = $file;
-  }
-
-  /*
-   * Collection methods.
-   */
-  public function batchInsert(&$a, $options = array())
-  {
-    foreach ($a as &$data)
-    {
-      $this->saveFile($data);
-    }
   }
 }

@@ -33,6 +33,11 @@ class MondongoGroupArray implements MondongoGroup
 
   /*
    * Constructor.
+   *
+   * @param array $elements An array of elements (optional).
+   * @param mixed $callback A callback for the changes (optional).
+   *
+   * @return void
    */
   public function __construct(array $elements = array(), $callback = null)
   {
@@ -41,31 +46,54 @@ class MondongoGroupArray implements MondongoGroup
   }
 
   /*
-   * setElements, getElements.
+   * Set the elements.
+   *
+   * @param array $elements An array of elements.
+   *
+   * return void
    */
   public function setElements(array $elements)
   {
     $this->elements = $elements;
   }
 
+  /**
+   * Returns the elements.
+   *
+   * @return array The elements.
+   */
   public function getElements()
   {
     return $this->elements;
   }
 
   /*
-   * Callback.
+   * Set the callback for the changes.
+   *
+   * @param mixed $callback A callback.
+   *
+   * @return voic
    */
   public function setCallback($callback)
   {
     $this->callback = $callback;
   }
 
+  /**
+   * Returns the callback for the changes.
+   *
+   * @return mixed The callback.
+   */
   public function getCallback()
   {
     return $this->callback;
   }
 
+  /**
+   * Call the callback for the changes.
+   *
+   * @return void
+   */
   protected function callback()
   {
     if ($this->callback)
@@ -74,8 +102,12 @@ class MondongoGroupArray implements MondongoGroup
     }
   }
 
-  /*
-   * Methods.
+  /**
+   * Add an element.
+   *
+   * @param mixed $element An element.
+   *
+   * @return void
    */
   public function add($element)
   {
@@ -84,6 +116,14 @@ class MondongoGroupArray implements MondongoGroup
     $this->callback();
   }
 
+  /**
+   * Set an element.
+   *
+   * @param mixed $key     The key.
+   * @param mixed $element The element.
+   *
+   * @return void
+   */
   public function set($key, $element)
   {
     $this->elements[$key] = $element;
@@ -91,26 +131,61 @@ class MondongoGroupArray implements MondongoGroup
     $this->callback();
   }
 
+  /**
+   * Returns if exists an element by key.
+   *
+   * @param mixed $key The key.
+   *
+   * @return boolean Returns if exists an element.
+   */
   public function exists($key)
   {
     return isset($this->elements[$key]);
   }
 
+  /**
+   * Returns if exists an element by element.
+   *
+   * @param mixed $element The element.
+   *
+   * @return boolean Returns if exists an element.
+   */
   public function existsElement($element)
   {
     return in_array($element, $this->elements, true);
   }
 
+  /**
+   * Returns the key of an element.
+   *
+   * @param mixed $elemen The element.
+   *
+   * @return mixed The key if the element exists, NULL otherwise.
+   */
   public function indexOf($element)
   {
     return array_search($element, $this->elements, true);
   }
 
+  /**
+   * Get an element by key.
+   *
+   * @param mixed $key The key.
+   *
+   * @return mixed The element if exists, NULL otherwise.
+   */
   public function get($key)
   {
     return isset($this->elements[$key]) ? $this->elements[$key] : null;
   }
 
+  /**
+   * Remove an element by key.
+   *
+   * @param mixed $key The key.
+   *
+   * @return void
+   */
   public function remove($key)
   {
     unset($this->elements[$key]);
@@ -118,6 +193,11 @@ class MondongoGroupArray implements MondongoGroup
     $this->callback();
   }
 
+  /**
+   * Clear the group.
+   *
+   * @return void
+   */
   public function clear()
   {
     $this->elements = array();

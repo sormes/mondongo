@@ -29,11 +29,23 @@ class MondongoConnection
 {
   protected $db;
 
+  /**
+   * Constructor.
+   *
+   * @param MongoDB $db A MongoDB object.
+   *
+   * @return void
+   */
   public function __construct(MongoDB $db)
   {
     $this->db = $db;
   }
 
+  /**
+   * Return the MongoDB object.
+   *
+   * @return MongoDB The MongoDB object.
+   */
   public function getDB()
   {
     return $this->db;

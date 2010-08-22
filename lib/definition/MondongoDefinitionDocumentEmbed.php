@@ -20,7 +20,7 @@
  */
 
 /**
- * Definition for documents embeds.
+ * Class to define documents embeds.
  *
  * @package Mondongo
  * @author  Pablo Díez Pascual <pablodip@gmail.com>

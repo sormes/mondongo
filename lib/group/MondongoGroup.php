@@ -20,26 +20,81 @@
  */
 
 /**
- * MondongoGroup.
+ * Interface of Mondongo Groups.
  *
  * @package Mondongo
  * @author  Pablo Díez Pascual <pablodip@gmail.com>
  */
 interface MondongoGroup extends ArrayAccess, Countable, IteratorAggregate
 {
+  /**
+   * Add an element.
+   *
+   * @param mixed $element An element.
+   *
+   * @return void
+   */
   public function add($element);
 
+  /**
+   * Set an element.
+   *
+   * @param mixed $key     The key.
+   * @param mixed $element The element.
+   *
+   * @return void
+   */
   public function set($key, $element);
 
+  /**
+   * Returns if exists an element by key.
+   *
+   * @param mixed $key The key.
+   *
+   * @return boolean Returns if exists an element.
+   */
   public function exists($key);
 
+  /**
+   * Returns if exists an element by element.
+   *
+   * @param mixed $element The element.
+   *
+   * @return boolean Returns if exists an element.
+   */
   public function existsElement($element);
 
+  /**
+   * Returns the key of an element.
+   *
+   * @param mixed $elemen The element.
+   *
+   * @return mixed The key if the element exists, NULL otherwise.
+   */
   public function indexOf($element);
 
+  /**
+   * Get an element by key.
+   *
+   * @param mixed $key The key.
+   *
+   * @return mixed The element if exists, NULL otherwise.
+   */
   public function get($key);
 
+  /**
+   * Remove an element by key.
+   *
+   * @param mixed $key The key.
+   *
+   * @return void
+   */
   public function remove($key);
 
+  /**
+   * Clear the group.
+   *
+   * @return void
+   */
   public function clear();
 }

@@ -27,11 +27,35 @@
  */
 abstract class MondongoType
 {
+  /**
+   * Convert a PHP value to Mongo value.
+   *
+   * @param mixed $value A value.
+   *
+   * @return The Mongo value.
+   */
   abstract public function toMongo($value);
 
+  /**
+   * Convert a Mongo value to PHP value.
+   *
+   * @param mixed $value A value.
+   *
+   * @return The PHP value.
+   */
   abstract public function toPHP($value);
 
+  /**
+   * Convert a PHP value to Mongo value (for closures).
+   *
+   * @return string The string for the closure.
+   */
   abstract public function closureToMongo();
 
+  /**
+   * Convert a Mongo value to PHP value (for closures).
+   *
+   * @return string The string for the closure.
+   */
   abstract public function closureToPHP();
 }

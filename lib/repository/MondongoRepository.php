@@ -39,8 +39,13 @@ class MondongoRepository
 
   protected $logCallable;
 
-  /*
+  /**
    * Constructor.
+   *
+   * @param string   $name     The document name (class).
+   * @param Mondongo $mondongo The Mondongo.
+   *
+   * @return void
    */
   public function __construct($name, Mondongo $mondongo)
   {
@@ -70,41 +75,72 @@ class MondongoRepository
     }
   }
 
-  /*
-   * Generic.
+  /**
+   * Returns the document name.
+   *
+   * @return string The document name.
    */
   public function getName()
   {
     return $this->name;
   }
 
+  /**
+   * Returns the Mondongo.
+   *
+   * @return Mondongo The Mondongo.
+   */
   public function getMondongo()
   {
     return $this->mondongo;
   }
 
+  /**
+   * Returns the definition.
+   *
+   * @return MondongoDefinitionDocument The definition.
+   */
   public function getDefinition()
   {
     return $this->definition;
   }
 
+  /**
+   * Returns the connection.
+   *
+   * @return MondongoConnection The connection.
+   */
   public function getConnection()
   {
     return $this->connection;
   }
 
+  /**
+   * Returns the collection.
+   *
+   * @return MondongoCollection The collection.
+   */
   public function getCollection()
   {
     return $this->collection;
   }
 
+  /**
+   * Returns the Mongo collection.
+   *
+   * @return MongoCollection The Mongo collection.
+   */
   public function getMongoCollection()
   {
     return $this->collection->getMongoCollection();
   }
 
-  /*
-   * Log.
+  /**
+   * Set the log callable.
+   *
+   * @param mixed $logCallable The log callable.
+   *
+   * @return void
    */
   public function setLogCallable($logCallable)
   {
@@ -116,13 +152,23 @@ class MondongoRepository
     ));
   }
 
+  /**
+   * Returns the log callable.
+   *
+   * @return mixed The log callable.
+   */
   public function getLogCallable()
   {
     return $this->logCallable;
   }
 
-  /*
-   * Find.
+  /**
+   * Find documents.
+   *
+   * @param array  $query   The query.
+   * @param array  $options An array of options.
+   *
+   * @return mixed The documents found within the parameters.
    */
   public function find($query = array(), array $options = array())
   {
@@ -220,11 +266,26 @@ class MondongoRepository
     return null;
   }
 
+  /**
+   * Find one document.
+   *
+   * @param array  $query   The query.
+   * @param array  $options An array of options.
+   *
+   * @return mixed The document found within the parameters.
+   */
   public function findOne($query = array(), array $options = array())
   {
     return $this->find($query, array_merge($options, array('one' => true)));
   }
 
+  /**
+   * Find a document by id.
+   *
+   * @param mixed  $id The document id (string or MongoId object).
+   *
+   * @return mixed The document or NULL if it does not exists.
+   */
   public function get($id)
   {
     $data = $this->collection->findOne(array('_id' => is_string($id) ? new MongoId($id) : $id));
@@ -232,16 +293,24 @@ class MondongoRepository
     return $data ? $this->buildDocument($data) : null;
   }
 
-  /*
-   * Remove.
+  /**
+   * Remove documents.
+   *
+   * @param string $query The query.
+   *
+   * @return void
    */
   public function remove($query = array())
   {
     $this->getCollection()->remove($query);
   }
 
-  /*
-   * BuildDocument.
+  /**
+   * Build a document.
+   *
+   * @param array $data The data.
+   *
+   * @return MondongoDocument The document.
    */
   protected function buildDocument($data)
   {
@@ -251,8 +320,12 @@ class MondongoRepository
     return $document;
   }
 
-  /*
-   * Save.
+  /**
+   * Save documents.
+   *
+   * @param array  $documents An array of documents.
+   *
+   * @return void
    */
   public function save($documents)
   {
@@ -339,8 +412,12 @@ class MondongoRepository
     }
   }
 
-  /*
-   * Delete.
+  /**
+   * Delete documents.
+   *
+   * @param array $documents An array of documents.
+   *
+   * @return void
    */
   public function delete($documents)
   {
@@ -376,8 +453,15 @@ class MondongoRepository
     }
   }
 
-  /*
-   * notifyEvent
+  /**
+   * Notify an event.
+   *
+   * @param array  $docs       The documents
+   * @param array  $events     The events.
+   * @param array  $extensions The extensions.
+   * @param string $event      The event.
+   *
+   * @return void
    */
   protected function notifyEvent($docs, $events, $extensions, $event)
   {
@@ -405,8 +489,10 @@ class MondongoRepository
     }
   }
 
-  /*
-   * Indexes.
+  /**
+   * Ensure the indexes.
+   *
+   * @return void
    */
   public function ensureIndexes()
   {
@@ -419,8 +505,15 @@ class MondongoRepository
     }
   }
 
-  /*
+  /**
    * __call
+   *
+   * @param string $name      The function name.
+   * @param array  $arguments The arguments.
+   *
+   * @return mixed The return of the extension.
+   *
+   * @throws BadMethodCallException If the function does not exists.
    */
   public function __call($name, $arguments)
   {

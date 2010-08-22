@@ -20,7 +20,7 @@
  */
 
 /**
- * Definition for documents.
+ * Class to define documents.
  *
  * @package Mondongo
  * @author  Pablo Díez Pascual <pablodip@gmail.com>
@@ -54,8 +54,8 @@ class MondongoDefinitionDocument extends MondongoDefinition
 
   protected $indexes = array();
 
-  /*
-   * Close.
+  /**
+   * @see MondongoDefinition
    */
   protected function doClose()
   {
@@ -103,8 +103,8 @@ class MondongoDefinitionDocument extends MondongoDefinition
     }
   }
 
-  /*
-   * DefaultData.
+  /**
+   * @see MondongoDefinition
    */
   protected function generateDefaultData()
   {
@@ -127,16 +127,22 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $data;
   }
 
-  /*
-   * HasFile.
+  /**
+   * Returns if the document has file.
+   *
+   * @return boolean Returns if the document has file.
    */
   public function hasFile()
   {
     return $this->hasFile;
   }
 
-  /*
-   * Events
+  /**
+   * Return the events of the document and extensions.
+   *
+   * @return array The events of the document and extensions.
+   *
+   * @throws LogicException If the definitions is not closed.
    */
   public function getEvents()
   {
@@ -145,8 +151,12 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this->events;
   }
 
-  /*
-   * Connection.
+  /**
+   * Set the connection name.
+   *
+   * @param string $connection The connection name.
+   *
+   * @return MondongoDefinitionDocument The current instance.
    */
   public function setConnection($connection)
   {
@@ -155,13 +165,22 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this;
   }
 
+  /**
+   * Return the connection name.
+   *
+   * @return mixed The connection name.
+   */
   public function getConnection()
   {
     return $this->connection;
   }
 
-  /*
-   * Collection.
+  /**
+   * Set the collection name.
+   *
+   * @param string $collection The collection name.
+   *
+   * @return MondongoDefinitionDocument The current instance.
    */
   public function setCollection($collection)
   {
@@ -170,13 +189,27 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this;
   }
 
+  /**
+   * Return the collection name.
+   *
+   * By default the unserscore of the  document name.
+   *
+   * @return string The collection name.
+   */
   public function getCollection()
   {
     return null !== $this->collection ? $this->collection : MondongoInflector::underscore($this->getName());
   }
 
   /*
-   * Embeds.
+   * Add an embed.
+   *
+   * @param string $name  The embed name.
+   * @param array  $embed The embed definition.
+   *
+   * @return MondongoDefinitionDocument The current instance.
+   *
+   * @throws LogicException If the name is busy.
    */
   public function embed($name, array $embed)
   {
@@ -187,16 +220,37 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this;
   }
 
+  /**
+   * Returns if an embed exists.
+   *
+   * @param string $name The embed name.
+   *
+   * @return boolean Returns if the embed exists.
+   */
   public function hasEmbed($name)
   {
     return isset($this->embeds[$name]);
   }
 
+  /**
+   * Return the embeds definitions.
+   *
+   * @return array The embeds definitions.
+   */
   public function getEmbeds()
   {
     return $this->embeds;
   }
 
+  /**
+   * Return an embed definition.
+   *
+   * @param string $name The embed name.
+   *
+   * @return array The embed definition.
+   *
+   * @throws InvalidArgumentException If the embed does not exists.
+   */
   public function getEmbed($name)
   {
     if (!$this->hasEmbed($name))
@@ -207,8 +261,15 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this->embeds[$name];
   }
 
-  /*
-   * Relations
+  /**
+   * Add a relation definition.
+   *
+   * @param string $name     The relation name.
+   * @param array  $relation The relation definition.
+   *
+   * @return MondongoDefinitionDocument The current instance.
+   *
+   * @throws LogicException If the name is busy.
    */
   public function relation($name, array $relation)
   {
@@ -219,16 +280,37 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this;
   }
 
+  /**
+   * Returns if a relation exists.
+   *
+   * @param string $name The relation name.
+   *
+   * @return boolean Returns if the relation exists.
+   */
   public function hasRelation($name)
   {
     return isset($this->relations[$name]);
   }
 
+  /**
+   * Returns the relations definitions.
+   *
+   * @return array The relations definitions.
+   */
   public function getRelations()
   {
     return $this->relations;
   }
 
+  /**
+   * Return a relation definition.
+   *
+   * @param string $name The relation name.
+   *
+   * @return array The relation definition.
+   *
+   * @throws InvalidArgumentException If the relation does not exists.
+   */
   public function getRelation($name)
   {
     if (!$this->hasRelation($name))
@@ -239,8 +321,12 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this->relations[$name];
   }
 
-  /*
-   * Extensions.
+  /**
+   * Add a extension.
+   *
+   * @param MondongoExtension A Mondongo extension.
+   *
+   * @return MondongoDefinitionDocument The current instance.
    */
   public function addExtension(MondongoExtension $extension)
   {
@@ -249,13 +335,22 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this;
   }
 
+  /**
+   * Returns the extensions.
+   *
+   * @return array The extensions.
+   */
   public function getExtensions()
   {
     return $this->extensions;
   }
 
-  /*
-   * Indexes.
+  /**
+   * Add an index.
+   *
+   * @param array $index An index definition.
+   *
+   * @return MondongoDefinitionDocument The current instance.
    */
   public function addIndex(array $index)
   {
@@ -264,13 +359,18 @@ class MondongoDefinitionDocument extends MondongoDefinition
     return $this;
   }
 
+  /**
+   * Return the indexes definitions.
+   *
+   * @return array The indexes definitions.
+   */
   public function getIndexes()
   {
     return $this->indexes;
   }
 
-  /*
-   * CheckName.
+  /**
+   * @see MondongoDefinition
    */
   protected function doCheckName($name)
   {
