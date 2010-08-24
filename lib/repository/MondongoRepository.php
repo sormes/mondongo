@@ -165,14 +165,35 @@ class MondongoRepository
   /**
    * Find documents.
    *
-   * @param array  $query   The query.
+   * Options:
+   *
+   *   * query:    the query (array)
+   *   * fields:   the fields (array)
+   *   * sort:     the sort
+   *   * limit:    the limit
+   *   * skip:     the skip
+   *   * one:      if returns one result (incompatible with limit)
+   *   * index_by: if index the results by a field
+   *
    * @param array  $options An array of options.
    *
-   * @return mixed The documents found within the parameters.
+   * @return mixed The document/s found within the parameters.
    */
-  public function find($query = array(), array $options = array())
+  public function find($options = array())
   {
-    $cursor = $this->collection->find($query);
+    // query
+    if (!isset($options['query']))
+    {
+      $options['query'] = array();
+    }
+
+    // fields
+    if (!isset($options['fields']))
+    {
+      $options['fields'] = array();
+    }
+
+    $cursor = $this->collection->find($options['query'], $options['fields']);
 
     // sort
     if (isset($options['sort']))
@@ -269,14 +290,15 @@ class MondongoRepository
   /**
    * Find one document.
    *
-   * @param array  $query   The query.
    * @param array  $options An array of options.
    *
    * @return mixed The document found within the parameters.
+   *
+   * @see ::find()
    */
-  public function findOne($query = array(), array $options = array())
+  public function findOne($options = array())
   {
-    return $this->find($query, array_merge($options, array('one' => true)));
+    return $this->find(array_merge($options, array('one' => true)));
   }
 
   /**
@@ -288,7 +310,7 @@ class MondongoRepository
    */
   public function get($id)
   {
-    $data = $this->collection->findOne(array('_id' => is_string($id) ? new MongoId($id) : $id));
+    $data = $this->collection->findOne(array('query' => array('_id' => is_string($id) ? new MongoId($id) : $id)));
 
     return $data ? $this->buildDocument($data) : null;
   }
@@ -296,13 +318,22 @@ class MondongoRepository
   /**
    * Remove documents.
    *
-   * @param string $query The query.
+   * Options:
+   *
+   *   * query: the query
+   *
+   * @param string $options An array of options.
    *
    * @return void
    */
-  public function remove($query = array())
+  public function remove($options = array())
   {
-    $this->getCollection()->remove($query);
+    if (!isset($options['query']))
+    {
+      $options['query'] = array();
+    }
+
+    $this->getCollection()->remove($options['query']);
   }
 
   /**

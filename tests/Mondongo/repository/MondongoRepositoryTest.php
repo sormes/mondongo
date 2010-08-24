@@ -90,8 +90,16 @@ class MondongoRepositoryTest extends MondongoTestCase
 
     $repository = $this->mondongo->getRepository('Article');
 
-    $this->assertEquals(array($articles[2]), $repository->find(array('_id' => new MongoId($articles[2]->getId()))));
-    $this->assertEquals(array($articles[5]), $repository->find(array('title' => 'Article 6')));
+    $this->assertEquals(array($articles[2]), $repository->find(array('query' => array('_id' => new MongoId($articles[2]->getId())))));
+    $this->assertEquals(array($articles[5]), $repository->find(array('query' => array('title' => 'Article 6'))));
+
+    $article = $repository->find(array('fields' => array('title' => 1), 'one' => true));
+    $this->assertSame('Article 3', $article['title']);
+    $this->assertNull($article['content']);
+    $this->assertFalse($article['is_active']);
+
+    $article = $repository->find(array('fields' => array('content' => 0), 'one' => true));
+    $this->assertNull($article['content']);
 
     $results = $repository->find();
     $this->assertEquals(8, count($results));
@@ -100,34 +108,34 @@ class MondongoRepositoryTest extends MondongoTestCase
       $this->assertTrue(in_array($article, $results));
     }
 
-    $this->assertEquals($articles, $repository->find(array(), array('sort' => array('title' => 1))));
+    $this->assertEquals($articles, $repository->find(array('sort' => array('title' => 1))));
 
     $this->assertEquals(
       array($articles[0], $articles[1], $articles[2]),
-      $repository->find(array(), array('sort' => array('title' => 1), 'limit' => 3))
+      $repository->find(array('sort' => array('title' => 1), 'limit' => 3))
     );
 
     $this->assertEquals(
       array($articles[6], $articles[7]),
-      $repository->find(array(), array('sort' => array('title' => 1), 'skip' => 6))
+      $repository->find(array('sort' => array('title' => 1), 'skip' => 6))
     );
 
     $this->assertEquals(
       array((string) $articles[6]->getId() => $articles[6], (string) $articles[7]->getId() => $articles[7]),
-      $repository->find(array(), array('sort' => array('title' => 1), 'skip' => 6, 'index_by' => '_id'))
+      $repository->find(array('sort' => array('title' => 1), 'skip' => 6, 'index_by' => '_id'))
     );
 
     $this->assertEquals(
       array($articles[6]->get('title') => $articles[6], $articles[7]->get('title') => $articles[7]),
-      $repository->find(array(), array('sort' => array('title' => 1), 'skip' => 6, 'index_by' => 'title'))
+      $repository->find(array('sort' => array('title' => 1), 'skip' => 6, 'index_by' => 'title'))
     );
 
-    $this->assertEquals($articles[0], $repository->find(array(), array('sort' => array('title' => 1), 'one' => true)));
+    $this->assertEquals($articles[0], $repository->find(array('sort' => array('title' => 1), 'one' => true)));
 
-    $this->assertNull($repository->find(array('_id' => 'no')));
+    $this->assertNull($repository->find(array('query' => array('_id' => 'no'))));
 
     // findOne
-    $this->assertEquals($articles[0], $repository->findOne(array(), array('sort' => array('title' => 1))));
+    $this->assertEquals($articles[0], $repository->findOne(array('sort' => array('title' => 1))));
 
     // get
     $this->assertEquals($articles[3], $repository->get($articles[3]->getId()));
@@ -138,7 +146,7 @@ class MondongoRepositoryTest extends MondongoTestCase
    */
   public function testFindIndexByInvalid()
   {
-    $this->mondongo->getRepository('Article')->find(array(), array('index_by' => 'no'));
+    $this->mondongo->getRepository('Article')->find(array('index_by' => 'no'));
   }
 
   public function testRemove()
@@ -154,8 +162,8 @@ class MondongoRepositoryTest extends MondongoTestCase
 
     $repository = $this->mondongo->getRepository('Article');
 
-    $repository->remove(array('_id' => new MongoId($id = $articles[5]->getId())));
-    $this->assertNull($repository->get($id));
+    $repository->remove(array('query' => array('_id' => new MongoId($id = $articles[5]->getId()))));
+    $this->assertEquals(7, count((array) $repository->find()));
 
     $repository->remove();
     $this->assertNull($repository->find());
