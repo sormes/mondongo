@@ -99,7 +99,7 @@ class MondongoDocumentBaseTest extends MondongoTestCase
 
     // set
     $article = new Article();
-    $article->set('categories', $group = new MondongoGroupArray(array($categories[1], $categories[2])));
+    $article->set('categories', $group = new MondongoGroup(array($categories[1], $categories[2])));
     $this->assertSame(
       array($categories[1]->getId(), $categories[2]->getId()),
       $article->get('category_ids')
@@ -122,7 +122,7 @@ class MondongoDocumentBaseTest extends MondongoTestCase
     $article->set('category_ids', $categoryIds);
 
     $retval = $article->get('categories');
-    $this->assertEquals('MondongoGroupArray', get_class($retval));
+    $this->assertEquals('MondongoGroup', get_class($retval));
     $this->assertEquals($categories, $retval->getElements());
   }
 

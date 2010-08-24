@@ -49,8 +49,7 @@ class MondongoAutoload
     // extension
     'MondongoExtension' => '/extension/MondongoExtension.php',
     // group
-    'MondongoGroup'      => '/group/MondongoGroup.php',
-    'MondongoGroupArray' => '/group/MondongoGroupArray.php',
+    'MondongoGroup' => '/group/MondongoGroup.php',
     // mondongo
     'Mondongo'          => '/mondongo/Mondongo.php',
     'MondongoContainer' => '/mondongo/MondongoContainer.php',

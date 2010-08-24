@@ -56,7 +56,7 @@ class MondongoDocumentTest extends MondongoTestCase
     $article = new Article();
     $article->clearFieldsModified();
 
-    $comments = new MondongoGroupArray(array($comment = new Comment()));
+    $comments = new MondongoGroup(array($comment = new Comment()));
     $article->set('comments', $comments);
 
     $this->assertFalse($article->isModified());
@@ -103,7 +103,7 @@ class MondongoDocumentTest extends MondongoTestCase
     $comment1->set('name', 'Pablo');
     $comment2 = new Comment();
     $comment2->set('email', 'foo@bar.com');
-    $article->set('comments', new MondongoGroupArray(array($comment1, $comment2)));
+    $article->set('comments', new MondongoGroup(array($comment1, $comment2)));
 
     $this->assertSame(array(
       'is_active' => false,
@@ -169,12 +169,12 @@ class MondongoDocumentTest extends MondongoTestCase
     $article = new Article();
 
     $comments = $article->get('comments');
-    $this->assertEquals('MondongoGroupArray', get_class($comments));
+    $this->assertEquals('MondongoGroup', get_class($comments));
     $this->assertSame($comments, $article->get('comments'));
 
     $article = new Article();
 
-    $comments = new MondongoGroupArray(array(new Comment(), new Comment()));
+    $comments = new MondongoGroup(array(new Comment(), new Comment()));
     $article->set('comments', $comments);
     $this->assertSame($comments, $article->get('comments'));
   }
@@ -194,7 +194,7 @@ class MondongoDocumentTest extends MondongoTestCase
   public function testEmbedsManyInvalidClass()
   {
     $article = new Article();
-    $article->set('comments', new MondongoGroupArray(array(new Comment(), new DateTime())));
+    $article->set('comments', new MondongoGroup(array(new Comment(), new DateTime())));
   }
 
   public function testRelationsOne()

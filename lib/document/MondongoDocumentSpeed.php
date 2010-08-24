@@ -349,7 +349,7 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
         // many
         else
         {
-          $value = new MondongoGroupArray();
+          $value = new MondongoGroup();
         }
 
         $this->data['embeds'][$name] = $value;

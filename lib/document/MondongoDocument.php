@@ -349,7 +349,7 @@ abstract class MondongoDocument extends MondongoDocumentBase
         // many
         else
         {
-          $value = new MondongoGroupArray();
+          $value = new MondongoGroup();
         }
 
         $this->data['embeds'][$name] = $value;

@@ -93,8 +93,8 @@ class MondongoRepositoryTest extends MondongoTestCase
     $this->assertEquals(array($articles[2]), $repository->find(array('query' => array('_id' => new MongoId($articles[2]->getId())))));
     $this->assertEquals(array($articles[5]), $repository->find(array('query' => array('title' => 'Article 6'))));
 
-    $article = $repository->find(array('fields' => array('title' => 1), 'one' => true));
-    $this->assertSame('Article 3', $article['title']);
+    $article = $repository->find(array('fields' => array('title' => 1), 'sort' => array('title' => 1), 'one' => true));
+    $this->assertSame('Article 1', $article['title']);
     $this->assertNull($article['content']);
     $this->assertFalse($article['is_active']);
 

@@ -361,7 +361,7 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
 
           if ($value = $repository->find(array('_id' => array('$in' => $id))))
           {
-            $value = new MondongoGroupArray($value, array($this, 'updateReferences'));
+            $value = new MondongoGroup($value, array($this, 'updateReferences'));
           }
         }
 

@@ -19,7 +19,7 @@
  * along with Mondongo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class MondongoGroupArrayTest extends MondongoTestCase
+class MondongoGroupTest extends MondongoTestCase
 {
   protected $elements = array('foo' => 'foobar', 'bar' => 'barfoo');
 
@@ -40,7 +40,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testConstructorSetElementsGetElements()
   {
-    $group = new MondongoGroupArray($this->elements);
+    $group = new MondongoGroup($this->elements);
     $this->assertSame($this->elements, $group->getElements());
 
     $group->setElements($elements = array('ups', 'spu'));
@@ -49,7 +49,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testCallback()
   {
-    $group = new MondongoGroupArray(array(), 'callback');
+    $group = new MondongoGroup(array(), 'callback');
 
     $this->assertEquals('callback', $group->getCallback());
     $group->setCallback('foobar');
@@ -59,7 +59,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
   public function testAdd()
   {
     $elements = $this->elements;
-    $group    = new MondongoGroupArray($elements);
+    $group    = new MondongoGroup($elements);
 
     $group->add('ups');
     array_push($elements, 'ups');
@@ -73,7 +73,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
   public function testSet()
   {
     $elements = $this->elements;
-    $group    = new MondongoGroupArray($elements);
+    $group    = new MondongoGroup($elements);
 
     $group->set('ups', 'spu');
     $elements['ups'] = 'spu';
@@ -86,7 +86,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testExists()
   {
-    $group = new MondongoGroupArray($this->elements);
+    $group = new MondongoGroup($this->elements);
 
     $this->assertTrue($group->exists('foo'));
     $this->assertFalse($group->exists('no'));
@@ -94,7 +94,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testExistsElement()
   {
-    $group = new MondongoGroupArray(array('foo' => $date = new DateTime(), 'bar' => 12));
+    $group = new MondongoGroup(array('foo' => $date = new DateTime(), 'bar' => 12));
 
     $this->assertTrue($group->existsElement($date));
     $this->assertTrue($group->existsElement(12));
@@ -105,7 +105,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testIndexOf()
   {
-    $group = new MondongoGroupArray(array('foo' => $date = new DateTime(), 'bar' => 12));
+    $group = new MondongoGroup(array('foo' => $date = new DateTime(), 'bar' => 12));
 
     $this->assertSame('foo', $group->indexOf($date));
     $this->assertSame('bar', $group->indexOf(12));
@@ -116,7 +116,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testRemove()
   {
-    $group = new MondongoGroupArray($this->elements);
+    $group = new MondongoGroup($this->elements);
 
     $group->remove('bar');
 
@@ -130,19 +130,19 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testClear()
   {
-    $group = new MondongoGroupArray($this->elements);
+    $group = new MondongoGroup($this->elements);
 
     $group->clear();
     $this->assertSame(array(), $group->getElements());
 
-    $group = new MondongoGroupArray($this->elements, $this->callback);
+    $group = new MondongoGroup($this->elements, $this->callback);
     $group->clear();
     $this->assertTrue($this->value);
   }
 
   public function testArrayAccess()
   {
-    $group = new MondongoGroupArray($this->elements);
+    $group = new MondongoGroup($this->elements);
 
     $this->assertTrue(isset($group['foo']));
     $this->assertFalse(isset($group['no']));
@@ -159,7 +159,7 @@ class MondongoGroupArrayTest extends MondongoTestCase
 
   public function testCountable()
   {
-    $group = new MondongoGroupArray($this->elements);
+    $group = new MondongoGroup($this->elements);
 
     $this->assertSame(2, $group->count());
     $this->assertSame(2, count($group));
