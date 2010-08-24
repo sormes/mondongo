@@ -138,6 +138,12 @@ class MondongoDocumentTest extends MondongoTestCase
     $this->assertSame(array(
       '$unset' => array('title' => 1),
     ), $article->getQueryForSave());
+
+    $article = $this->mondongo->find('Article', array('query' => array('_id' => $article->getId()), 'fields' => array('title' => 1), 'one' => true));
+    $this->assertSame(array(), $article->getQueryForSave());
+
+    $article->set('is_active', false);
+    $this->assertSame(array('$set' => array('is_active' => false)), $article->getQueryForSave());
   }
 
   public function testEmbedsOne()
