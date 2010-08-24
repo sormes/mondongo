@@ -129,6 +129,37 @@ class MondongoTest extends MondongoTestCase
     $this->assertEquals('barfoo', $repository->getLogCallable());
   }
 
+  public function testFindFindOneGet()
+  {
+    $articles = array();
+    for ($i = 1; $i <= 9; $i++)
+    {
+      $articles[] = $article = new Article();
+      $article->set('title', 'Article '.$i);
+    }
+    $this->mondongo->save('Article', $articles);
+
+    $this->assertEquals($articles, $this->mondongo->find('Article', array('sort' => array('title' => 1))));
+
+    $this->assertEquals($articles[2], $this->mondongo->findOne('Article', array('query' => array('_id' => $articles[2]->getId()))));
+
+    $this->assertEquals($articles[2], $this->mondongo->get('Article', $articles[2]->getId()));
+  }
+
+  public function testRemove()
+  {
+    $articles = array();
+    for ($i = 1; $i <= 9; $i++)
+    {
+      $articles[] = $article = new Article();
+      $article->set('title', 'Article '.$i);
+    }
+    $this->mondongo->save('Article', $articles);
+
+    $this->mondongo->remove('Article', array('query' => array('title' => 'Article 1')));
+    $this->assertEquals(8, count($this->mondongo->find('Article')));
+  }
+
   public function testSaveBasic()
   {
     $article = new Article();

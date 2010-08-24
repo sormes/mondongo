@@ -252,28 +252,30 @@ class Mondongo
    * Find documents.
    *
    * @param string $name    The document name.
-   * @param array  $query   The query.
    * @param array  $options An array of options.
    *
    * @return mixed The documents found within the parameters.
+   *
+   * @see MondongoRepository::find()
    */
-  public function find($name, $query = array(), $options = array())
+  public function find($name, $options = array())
   {
-    return $this->getRepository($name)->find($query, $options);
+    return $this->getRepository($name)->find($options);
   }
 
   /**
    * Find one document.
    *
    * @param string $name    The document name.
-   * @param array  $query   The query.
    * @param array  $options An array of options.
    *
    * @return mixed The document found within the parameters.
+   *
+   * @see MondongoRepository::findOne()
    */
-  public function findOne($name, $query = array(), $options = array())
+  public function findOne($name, $options = array())
   {
-    return $this->getRepository($name)->findOne($query, $options);
+    return $this->getRepository($name)->findOne($options);
   }
 
   /**
@@ -287,6 +289,21 @@ class Mondongo
   public function get($name, $id)
   {
     return $this->getRepository($name)->get($id);
+  }
+
+  /**
+   * Remove documents.
+   *
+   * @param string $name    The document name.
+   * @param array  $options An array of options.
+   *
+   * @return void
+   *
+   * @see MondongoRepository::remove()
+   */
+  public function remove($name, $options = array())
+  {
+    $this->getRepository($name)->remove($options);
   }
 
   /**
