@@ -35,32 +35,51 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
 
   protected $fieldsModified = array();
 
-  /*
-   * Definition
+  /**
+   * Returns the definition (using MondongoContainer).
+   *
+   * @return MondongoDefinition The definition.
    */
   public function getDefinition()
   {
     return MondongoContainer::getDefinition(get_class($this));
   }
 
-  /*
-   * Modified.
+  /**
+   * Returns if the document is modified.
+   *
+   * @return bool Returns if the document is modified.
    */
   public function isModified()
   {
     return (bool) $this->fieldsModified;
   }
 
+  /**
+   * Returns the fields modified with old values.
+   *
+   * @return array The fields modified.
+   */
   public function getFieldsModified()
   {
     return $this->fieldsModified;
   }
 
+  /**
+   * Clear the fields modified.
+   *
+   * @return void
+   */
   public function clearFieldsModified()
   {
     $this->fieldsModified = array();
   }
 
+  /**
+   * Revert the fields modified.
+   *
+   * @return void
+   */
   public function revertFieldsModified()
   {
     foreach ($this->fieldsModified as $name => $value)
@@ -70,8 +89,13 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     $this->clearFieldsModified();
   }
 
-  /*
-   * setData
+  /**
+   * Set the data of the document (hydrate).
+   *
+   * @param array   $data    The data.
+   * @param Closure $closure The closure to PHP.
+   *
+   * @return void
    */
   public function setData($data, $closureToPHP = null)
   {
@@ -103,8 +127,13 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     $this->fieldsModified = array();
   }
 
-  /*
-   * set, get
+  /**
+   * Set a datum.
+   *
+   * @param string $name  The name.
+   * @param mixed  $value The value.
+   *
+   * @return void
    */
   public function set($name, $value)
   {
@@ -133,6 +162,13 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     return $this->doSet($name, $value);
   }
 
+  /**
+   * Returns a datum.
+   *
+   * @param string $name The name.
+   *
+   * @return mixed The datum.
+   */
   public function get($name)
   {
     $class = get_class($this);
@@ -160,8 +196,14 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     return $this->doGet($name);
   }
 
-  /*
-   * doSet.
+  /**
+   * Do the set of a datum,
+   *
+   * @param string $name     The name.
+   * @param mixed  $value    The value.
+   * @param bool   $modified If the change is modified or no.
+   *
+   * @return void
    */
   protected function doSet($name, $value, $modified = true)
   {
@@ -250,17 +292,37 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     throw new InvalidArgumentException(sprintf('The data "%s" does not exists.', $name));
   }
 
+  /**
+   * Returns if has more doSet for a name.
+   *
+   * @param string $name The name,
+   *
+   * @return bool Returns if has more doSet.
+   */
   protected function hasDoSetMore($name)
   {
     return false;
   }
 
+  /**
+   * Process more doSet.
+   *
+   * @param string $name     The name.
+   * @param mixed  $value    The value.
+   * @param bool   $modified If the change is modified or no.
+   *
+   * @return void
+   */
   protected function doSetMore($name, $value, $modified)
   {
   }
 
-  /*
-   * doGet.
+  /**
+   * Do the get of a datum.
+   *
+   * @param string The name.
+   *
+   * @return mixed The datum.
    */
   protected function doGet($name)
   {
@@ -323,17 +385,33 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     throw new InvalidArgumentException(sprintf('The data "%s" does not exists.', $name));
   }
 
+  /**
+   * Returns if has more doGet for a name.
+   *
+   * @param string $name The name,
+   *
+   * @return bool Returns if has more doGet.
+   */
   protected function hasDoGetMore($name)
   {
     return false;
   }
 
+  /**
+   * Process more doGet.
+   *
+   * @param string $name The name.
+   *
+   * @return void
+   */
   protected function doGetMore($name)
   {
   }
 
-  /*
-   * UpdateReferences.
+  /**
+   * Update the references.
+   *
+   * @return void
    */
   public function updateReferences()
   {
@@ -362,8 +440,12 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     }
   }
 
-  /*
-   * toArray, fromArray.
+  /**
+   * Import the data from array.
+   *
+   * @param array $array The array.
+   *
+   * @return void
    */
   public function fromArray(array $array)
   {
@@ -373,6 +455,11 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     }
   }
 
+  /**
+   * Export the data to array.
+   *
+   * @return array The data.
+   */
   public function toArray()
   {
     $array = array();
@@ -427,8 +514,10 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     throw new LogicException('Cannot isset data.');
   }
 
-  /*
-   * mutators
+  /**
+   * Returns the mutators.
+   *
+   * @return array The mutators.
    */
   protected function getMutators()
   {
@@ -438,8 +527,15 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     );
   }
 
-  /*
+  /**
    * __call
+   *
+   * @param string $name      The function name.
+   * @param array  $arguments The arguments.
+   *
+   * @return mixed The return of the extension.
+   *
+   * @throws BadMethodCallException If the method does not exists.
    */
   public function __call($name, $arguments)
   {

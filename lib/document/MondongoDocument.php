@@ -29,24 +29,30 @@ abstract class MondongoDocument extends MondongoDocumentBase
 {
   protected $id;
 
-  /*
-   * Mondongo.
+  /**
+   * Returns the Mondongo (using MondongoContainer).
+   *
+   * @return Mondongo The Mondongo.
    */
   public function getMondongo()
   {
     return MondongoContainer::getForName(get_class($this));
   }
 
-  /*
-   * Repository.
+  /**
+   * Returns the Repository (using MondongoContainer).
+   *
+   * @return MondongoRepository The repository.
    */
   public function getRepository()
   {
     return $this->getMondongo()->getRepository(get_class($this));
   }
 
-  /*
-   * Modified.
+  /**
+   * Returns if the document is modified.
+   *
+   * @return bool Returns if the document is modified.
    */
   public function isModified()
   {
@@ -82,6 +88,11 @@ abstract class MondongoDocument extends MondongoDocumentBase
     return $retval;
   }
 
+  /**
+   * Clear the modifieds of the document.
+   *
+   * @return void
+   */
   public function clearModified()
   {
     $this->clearFieldsModified();
@@ -108,29 +119,42 @@ abstract class MondongoDocument extends MondongoDocumentBase
     }
   }
 
-  /*
-   * New
+  /**
+   * Returns if the document is new.
+   *
+   * @return bool Returns if the document is new.
    */
   public function isNew()
   {
     return null === $this->id;
   }
 
-  /*
-   * Id
+  /**
+   * Set the MongoId.
+   *
+   * @param MongoId The MongoId.
+   *
+   * @return void
    */
   public function setId($id)
   {
     $this->id = $id;
   }
 
+  /**
+   * Returns the MongoId.
+   *
+   * @return MongoId The MongoId.
+   */
   public function getId()
   {
     return $this->id;
   }
 
-  /*
-   * Save.
+  /**
+   * Save the document (using MondongoContainer).
+   *
+   * @return void
    */
   public function save()
   {
@@ -138,15 +162,19 @@ abstract class MondongoDocument extends MondongoDocumentBase
   }
 
   /*
-   * Delete.
+   * Delete the document (using MondongoContainer).
+   *
+   * @return void
    */
   public function delete()
   {
     $this->getRepository()->delete($this);
   }
 
-  /*
-   * QueryForSave.
+  /**
+   * Returns the query for save.
+   *
+   * @return array The query for save.
    */
   public function getQueryForSave()
   {
@@ -239,14 +267,17 @@ abstract class MondongoDocument extends MondongoDocumentBase
     return $query;
   }
 
-  /*
-   * doSet
+  /**
+   * @see MondongoDocumentBaseSpeed
    */
   protected function hasDoSetMore($name)
   {
     return array_key_exists($name, $this->data['embeds']);
   }
 
+  /**
+   * @see MondongoDocumentBaseSpeed
+   */
   protected function doSetMore($name, $value, $modified)
   {
     if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
@@ -286,8 +317,8 @@ abstract class MondongoDocument extends MondongoDocumentBase
     }
   }
 
-  /*
-   * doGet
+  /**
+   * @see MondongoDocumentBaseSpeed
    */
   protected function hasDoGetMore($name)
   {
@@ -298,6 +329,9 @@ abstract class MondongoDocument extends MondongoDocumentBase
     ;
   }
 
+  /**
+   * @see MondongoDocumentBaseSpeed
+   */
   protected function doGetMore($name)
   {
     if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
@@ -351,8 +385,8 @@ abstract class MondongoDocument extends MondongoDocumentBase
     }
   }
 
-  /*
-   * mutators
+  /**
+   * @see MondongoDocumentBaseSpeed
    */
   protected function getMutators()
   {
@@ -363,8 +397,15 @@ abstract class MondongoDocument extends MondongoDocumentBase
     );
   }
 
-  /*
+  /**
    * __call
+   *
+   * @param string $name      The function name.
+   * @param array  $arguments The arguments.
+   *
+   * @return mixed The return of the extension.
+   *
+   * @throws BadMethodCallException If the method does not exists.
    */
   public function __call($name, $arguments)
   {

@@ -27,8 +27,10 @@
  */
 abstract class MondongoDocumentBase extends MondongoDocumentBaseSpeed implements ArrayAccess
 {
-  /*
+  /**
    * Constructor.
+   *
+   * @return void
    */
   public function __construct()
   {

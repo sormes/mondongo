@@ -513,7 +513,7 @@ class MondongoRepository
    *
    * @return mixed The return of the extension.
    *
-   * @throws BadMethodCallException If the function does not exists.
+   * @throws BadMethodCallException If the method does not exists.
    */
   public function __call($name, $arguments)
   {
