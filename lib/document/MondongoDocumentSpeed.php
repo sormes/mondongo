@@ -50,76 +50,6 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
   }
 
   /**
-   * Returns if the document is modified.
-   *
-   * @return bool Returns if the document is modified.
-   */
-  public function isModified()
-  {
-    $retval = parent::isModified();
-
-    if (isset($this->data['embeds']))
-    {
-      foreach ($this->data['embeds'] as $embed)
-      {
-        if (null !== $embed)
-        {
-          if ($embed instanceof MondongoDocumentEmbed)
-          {
-            if ($embed->isModified())
-            {
-              $retval = true;
-            }
-          }
-          else
-          {
-            foreach ($embed as $e)
-            {
-              if ($e->isModified())
-              {
-                $retval = true;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return $retval;
-  }
-
-  /**
-   * Clear the modifieds of the document.
-   *
-   * @return void
-   */
-  public function clearModified()
-  {
-    $this->clearFieldsModified();
-
-    if (isset($this->data['embeds']))
-    {
-      foreach ($this->data['embeds'] as $embed)
-      {
-        if (null !== $embed)
-        {
-          if ($embed instanceof MondongoDocumentEmbed)
-          {
-            $embed->clearFieldsModified();
-          }
-          else
-          {
-            foreach ($embed as $e)
-            {
-              $e->clearFieldsModified();
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * Returns if the document is new.
    *
    * @return bool Returns if the document is new.
@@ -214,51 +144,21 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
     // embeds
     if (isset($this->data['embeds']))
     {
-      foreach ($this->data['embeds'] as $name => $embed)
+      foreach (array_keys($this->data['embeds']) as $name)
       {
+        $embed = $this->get($name);
+
         if (null !== $embed)
         {
-          // one
-          if ($embed instanceof MondongoDocumentEmbed)
-          {
-            if ($datum = $embed->toArray())
-            {
-              $value = $embed->getDefinition()->dataToMongo($datum);
-            }
-            else
-            {
-              $value = array();
-            }
+          $value = $this->queryForSaveEmbed($embed);
 
-            if ($this->isNew())
-            {
-              $query[$name] = $value;
-            }
-            else
-            {
-              $query['$set'][$name] = $value;
-            }
+          if ($this->isNew())
+          {
+            $query[$name] = $value;
           }
-          // many
           else
           {
-            $value = array();
-            foreach ($embed as $key => $e)
-            {
-              if ($datum = $e->toArray())
-              {
-                $value[] = $e->getDefinition()->dataToMongo($datum);
-              }
-            }
-
-            if ($this->isNew())
-            {
-              $query[$name] = $value;
-            }
-            else
-            {
-              $query['$set'][$name] = $value;
-            }
+            $query['$set'][$name] = $value;
           }
         }
       }
@@ -267,54 +167,34 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
     return $query;
   }
 
-  /**
-   * @see MondongoDocumentBaseSpeed
-   */
-  protected function hasDoSetMore($name)
+  protected function queryForSaveEmbed($embed)
   {
-    return array_key_exists($name, $this->data['embeds']);
-  }
-
-  /**
-   * @see MondongoDocumentBaseSpeed
-   */
-  protected function doSetMore($name, $value, $modified)
-  {
-    if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
+    // one
+    if ($embed instanceof MondongoDocumentEmbed)
     {
-      $embed = $this->getDefinition()->getEmbed($name);
-      $class = $embed['class'];
+      $definition = $embed->getDefinition();
 
-      // one
-      if ('one' == $embed['type'])
+      if ($value = $embed->toArray(false))
       {
-        if (!$value instanceof $class)
-        {
-          throw new InvalidArgumentException(sprintf('The embed "%s" is not a instance of "%s".', $name, $class));
-        }
-      }
-      // many
-      else
-      {
-        if (!$value instanceof MondongoGroup)
-        {
-          throw new InvalidArgumentException(sprintf('The embed "%s" is not a instanceof MondongoGroup.', $name));
-        }
-
-        foreach ($value as $v)
-        {
-          if (!$v instanceof $class)
-          {
-            throw new InvalidArgumentException(sprintf('The embed "%s" is not a instance of "%s".', $name, $class));
-          }
-        }
-
+        $value = $definition->dataToMongo($value);
       }
 
-      $this->data['embeds'][$name] = $value;
-
-      return;
+      foreach ($definition->getEmbeds() as $name => $embedDefinition)
+      {
+        $value[$name] = $this->queryForSaveEmbed($embed->get($name));
+      }
     }
+    // many
+    else
+    {
+      $value = array();
+      foreach ($embed as $key => $e)
+      {
+        $value[$key] = $this->queryForSaveEmbed($e);
+      }
+    }
+
+    return $value;
   }
 
   /**
@@ -322,11 +202,7 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
    */
   protected function hasDoGetMore($name)
   {
-    return
-      (isset($this->data['embeds']) ? array_key_exists($name, $this->data['embeds']) : false)
-      ||
-      (isset($this->data['relations']) ? array_key_exists($name, $this->data['relations']) : false)
-    ;
+    return isset($this->data['relations']) ? array_key_exists($name, $this->data['relations']) : false;
   }
 
   /**
@@ -334,30 +210,7 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
    */
   protected function doGetMore($name)
   {
-    if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
-    {
-      if (null === $this->data['embeds'][$name])
-      {
-        $embed = $this->getDefinition()->getEmbed($name);
-        $class = $embed['class'];
-
-        // one
-        if ('one' == $embed['type'])
-        {
-          $value = new $class();
-        }
-        // many
-        else
-        {
-          $value = new MondongoGroup();
-        }
-
-        $this->data['embeds'][$name] = $value;
-      }
-
-      return $this->data['embeds'][$name];
-    }
-
+    // relations
     if (isset($this->data['relations']) && array_key_exists($name, $this->data['relations']))
     {
       if (null === $this->data['relations'][$name])
@@ -392,7 +245,6 @@ abstract class MondongoDocumentSpeed extends MondongoDocumentBaseSpeed
   {
     return array_merge(
       parent::getMutators(),
-      isset($this->data['embeds']) ? array_keys($this->data['embeds']) : array(),
       isset($this->data['relations']) ? array_keys($this->data['relations']) : array()
     );
   }
