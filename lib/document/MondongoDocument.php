@@ -188,17 +188,7 @@ abstract class MondongoDocument extends MondongoDocumentBase
       $value = array();
       foreach ($embed as $key => $e)
       {
-        $definition = $e->getDefinition();
-
-        if ($datum = $e->toArray(false))
-        {
-          $value[$key] = $definition->dataToMongo($datum);
-        }
-
-        foreach ($definition->getEmbeds() as $name => $embedDefinition)
-        {
-          $value[$key][$name] = $this->queryForSaveEmbed($e->get($name));
-        }
+        $value[$key] = $this->queryForSaveEmbed($e);
       }
     }
 
