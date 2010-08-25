@@ -52,7 +52,10 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
    */
   public function isModified()
   {
-    $retval =  (bool) $this->fieldsModified;
+    if ($this->fieldsModified)
+    {
+      return true;
+    }
 
     if (isset($this->data['embeds']))
     {
@@ -64,7 +67,7 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
           {
             if ($embed->isModified())
             {
-              $retval = true;
+              return true;
             }
           }
           else
@@ -73,7 +76,7 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
             {
               if ($e->isModified())
               {
-                $retval = true;
+                return true;
               }
             }
           }
@@ -81,7 +84,7 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
       }
     }
 
-    return $retval;
+    return false;
   }
 
   /**
