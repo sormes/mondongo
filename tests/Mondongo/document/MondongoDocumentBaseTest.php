@@ -37,6 +37,42 @@ class MondongoDocumentBaseTest extends MondongoTestCase
     $this->assertSame(array(), $article->getFieldsModified());
   }
 
+  public function testModifiedEmbedOne()
+  {
+    $article = new Article();
+    $article->clearFieldsModified();
+
+    $source = new Source();
+    $article->set('source', $source);
+
+    $this->assertFalse($article->isModified());
+
+    $source->set('title', 'Ups');
+    $this->assertTrue($article->isModified());
+
+    $article->clearModified();
+    $this->assertFalse($article->isModified());
+    $this->assertFalse($source->isModified());
+  }
+
+  public function testModifiedEmbedMany()
+  {
+    $article = new Article();
+    $article->clearFieldsModified();
+
+    $comments = new MondongoGroup(array($comment = new Comment()));
+    $article->set('comments', $comments);
+
+    $this->assertFalse($article->isModified());
+
+    $comment->set('name', 'Ups');
+    $this->assertTrue($article->isModified());
+
+    $article->clearModified();
+    $this->assertFalse($article->isModified());
+    $this->assertFalse($comment->isModified());
+  }
+
   public function testSetGetFields()
   {
     $document = new MondongoDocumentTesting();
@@ -144,6 +180,63 @@ class MondongoDocumentBaseTest extends MondongoTestCase
     $article->set('categories', array(new Category(), new DateTime()));
   }
 
+  public function testEmbedsOne()
+  {
+    $article = new Article();
+
+    $source = $article->get('source');
+    $this->assertEquals('Source', get_class($source));
+    $this->assertSame($source, $article->get('source'));
+
+    $article = new Article();
+
+    $source = new Source();
+    $article->set('source', $source);
+    $this->assertSame($source, $article->get('source'));
+  }
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testEmbedsOneInvalidClass()
+  {
+    $article = new Article();
+    $article->set('source', new Category());
+  }
+
+  public function testEmbedsMany()
+  {
+    $article = new Article();
+
+    $comments = $article->get('comments');
+    $this->assertEquals('MondongoGroup', get_class($comments));
+    $this->assertSame($comments, $article->get('comments'));
+
+    $article = new Article();
+
+    $comments = new MondongoGroup(array(new Comment(), new Comment()));
+    $article->set('comments', $comments);
+    $this->assertSame($comments, $article->get('comments'));
+  }
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testEmbedsManyInvalidGroup()
+  {
+    $article = new Article();
+    $article->set('comments', array(new Comment()));
+  }
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testEmbedsManyInvalidClass()
+  {
+    $article = new Article();
+    $article->set('comments', new MondongoGroup(array(new Comment(), new DateTime())));
+  }
+
   /**
    * @expectedException InvalidArgumentException
    */
@@ -162,6 +255,92 @@ class MondongoDocumentBaseTest extends MondongoTestCase
     $document = new MondongoDocumentTesting();
 
     $document->get('no');
+  }
+
+  public function testFromArray()
+  {
+    $article = new Article();
+    $article->fromArray(array(
+      'title'   => 'Mondongo',
+      'content' => 'Content',
+      'source'  => array(
+        'title' => 'Source',
+        'url'   => 'http://mondongo.es',
+      ),
+      'comments' => array(
+        array(
+          'name'  => 'Foo',
+          'email' => 'foo@bar.com',
+        ),
+        array(
+          'name'  => 'Bar',
+          'email' => 'bar@foo.com',
+        ),
+      ),
+    ));
+
+    $this->assertEquals($article->get('title'), 'Mondongo');
+    $this->assertEquals($article->get('content'), 'Content');
+    $this->assertEquals($article->get('source')->get('title'), 'Source');
+    $this->assertEquals($article->get('source')->get('url'), 'http://mondongo.es');
+    $this->assertEquals($article->get('comments')->count(), 2);
+    $this->assertEquals($article->get('comments')->get(0)->get('name'), 'Foo');
+    $this->assertEquals($article->get('comments')->get(0)->get('email'), 'foo@bar.com');
+    $this->assertEquals($article->get('comments')->get(1)->get('name'), 'Bar');
+    $this->assertEquals($article->get('comments')->get(1)->get('email'), 'bar@foo.com');
+  }
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testFromArrayInvalidData()
+  {
+    $article = new Article();
+    $article->fromArray(array(
+      'title' => 'Title',
+      'foo'   => 'bar',
+    ));
+  }
+
+  public function testToArray()
+  {
+    $source = new Source();
+    $source['title'] = 'Source';
+    $source['url']   = 'http://mondongo.es';
+
+    $comments = array();
+    $comments[0] = $comment = new Comment();
+    $comment['name']  = 'Foo';
+    $comment['email'] = 'foo@bar.com';
+    $comments[1] = $comment = new Comment();
+    $comment['name']  = 'Bar';
+    $comment['email'] = 'bar@foo.com';
+
+    $article = new Article();
+    $article['title']   = 'Mondongo';
+    $article['content'] = 'Content';
+    $article['source']  = $source;
+    $article['comments']->setElements($comments);
+
+    $this->assertEquals(array(
+      'title'     => 'Mondongo',
+      'content'   => 'Content',
+      'is_active' => false,
+      'source'  => array(
+        'title' => 'Source',
+        'url'   => 'http://mondongo.es',
+      ),
+      'comments' => array(
+        array(
+          'name'  => 'Foo',
+          'email' => 'foo@bar.com',
+        ),
+        array(
+          'name'  => 'Bar',
+          'email' => 'bar@foo.com',
+        ),
+      ),
+    ), $article->toArray());
   }
 
   public function testMagicSetters()

@@ -144,6 +144,34 @@ class MondongoDefinitionTest extends MondongoTestCase
     $definition->getReference('no');
   }
 
+  public function testEmbeds()
+  {
+    $definition = new MondongoDefinitionDocument('Author');
+
+    $this->assertFalse($definition->hasEmbed('address'));
+
+    $address  = array('class' => 'Address', 'type' => 'one');
+    $comments = array('class' => 'Comment', 'type' => 'many');
+
+    $this->assertSame($definition, $definition->embed('address', $address));
+    $this->assertTrue($definition->hasEmbed('address'));
+    $this->assertSame($address, $definition->getEmbed('address'));
+
+    $this->assertSame($definition, $definition->embed('comments', $comments));
+    $this->assertSame($comments, $definition->getEmbed('comments'));
+
+    $this->assertSame(array('address' => $address, 'comments' => $comments), $definition->getEmbeds());
+  }
+
+  /**
+   * @expectedException InvalidArgumentException
+   */
+  public function testGetEmbedNotExists()
+  {
+    $definition = new MondongoDefinitionDocument('Author');
+    $definition->getEmbed('no');
+  }
+
   public function testDefault()
   {
     $definition = new MondongoDefinitionTesting('Article');
@@ -158,6 +186,7 @@ class MondongoDefinitionTest extends MondongoTestCase
     $this->assertSame(array(
       'fields'     => array('foo' => null, 'bar' => 'barfoo', 'foobar_id' => null),
       'references' => array('foobar' => null),
+      'embeds'     => array(),
     ), $definition->getDefaultData());
 
     $this->assertSame(array(

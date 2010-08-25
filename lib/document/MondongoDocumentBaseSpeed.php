@@ -52,7 +52,36 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
    */
   public function isModified()
   {
-    return (bool) $this->fieldsModified;
+    $retval =  (bool) $this->fieldsModified;
+
+    if (isset($this->data['embeds']))
+    {
+      foreach ($this->data['embeds'] as $embed)
+      {
+        if (null !== $embed)
+        {
+          if ($embed instanceof MondongoDocumentEmbed)
+          {
+            if ($embed->isModified())
+            {
+              $retval = true;
+            }
+          }
+          else
+          {
+            foreach ($embed as $e)
+            {
+              if ($e->isModified())
+              {
+                $retval = true;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $retval;
   }
 
   /**
@@ -87,6 +116,37 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
       $this->data['fields'][$name] = $value;
     }
     $this->clearFieldsModified();
+  }
+
+  /**
+   * Clear the modifieds of the document.
+   *
+   * @return void
+   */
+  public function clearModified()
+  {
+    $this->clearFieldsModified();
+
+    if (isset($this->data['embeds']))
+    {
+      foreach ($this->data['embeds'] as $embed)
+      {
+        if (null !== $embed)
+        {
+          if ($embed instanceof MondongoDocumentEmbed)
+          {
+            $embed->clearFieldsModified();
+          }
+          else
+          {
+            foreach ($embed as $e)
+            {
+              $e->clearFieldsModified();
+            }
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -281,6 +341,43 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
       return;
     }
 
+    // embeds
+    if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
+    {
+      $embed = $this->getDefinition()->getEmbed($name);
+      $class = $embed['class'];
+
+      // one
+      if ('one' == $embed['type'])
+      {
+        if (!$value instanceof $class)
+        {
+          throw new InvalidArgumentException(sprintf('The embed "%s" is not a instance of "%s".', $name, $class));
+        }
+      }
+      // many
+      else
+      {
+        if (!$value instanceof MondongoGroup)
+        {
+          throw new InvalidArgumentException(sprintf('The embed "%s" is not a instanceof MondongoGroup.', $name));
+        }
+
+        foreach ($value as $v)
+        {
+          if (!$v instanceof $class)
+          {
+            throw new InvalidArgumentException(sprintf('The embed "%s" is not a instance of "%s".', $name, $class));
+          }
+        }
+
+      }
+
+      $this->data['embeds'][$name] = $value;
+
+      return;
+    }
+
     // more
     if ($this->hasDoSetMore($name))
     {
@@ -376,6 +473,31 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
       return $this->data['references'][$name];
     }
 
+    // embeds
+    if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
+    {
+      if (null === $this->data['embeds'][$name])
+      {
+        $embed = $this->getDefinition()->getEmbed($name);
+        $class = $embed['class'];
+
+        // one
+        if ('one' == $embed['type'])
+        {
+          $value = new $class();
+        }
+        // many
+        else
+        {
+          $value = new MondongoGroup();
+        }
+
+        $this->data['embeds'][$name] = $value;
+      }
+
+      return $this->data['embeds'][$name];
+    }
+
     // more
     if ($this->hasDoGetMore($name))
     {
@@ -451,16 +573,53 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
   {
     foreach ($array as $name => $value)
     {
-      $this->set($name, $value);
+      if (isset($this->data['fields']) && array_key_exists($name, $this->data['fields']))
+      {
+        $this->set($name, $value);
+
+        continue;
+      }
+
+      if (isset($this->data['embeds']) && array_key_exists($name, $this->data['embeds']))
+      {
+        $embed = $this->get($name);
+
+        // one
+        if ($embed instanceof MondongoDocumentEmbed)
+        {
+          $embed->fromArray($value);
+        }
+        // many
+        else
+        {
+          $embedDefinition = $this->getDefinition()->getEmbed($name);
+          $class           = $embedDefinition['class'];
+
+          $elements = array();
+          foreach ($value as $datum)
+          {
+            $elements[] = $element = new $class();
+            $element->fromArray($datum);
+          }
+
+          $embed->setElements($elements);
+        }
+
+        continue;
+      }
+
+      throw new InvalidArgumentException(sprintf('The data "%s" does not exists.', $name));
     }
   }
 
   /**
    * Export the data to array.
    *
+   * @param bool $withEmbeds If export embeds (TRUE by default).
+   *
    * @return array The data.
    */
-  public function toArray()
+  public function toArray($withEmbeds = true)
   {
     $array = array();
 
@@ -468,9 +627,39 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
     {
       foreach ($this->data['fields'] as $name => $value)
       {
-        if (null !== $value)
+        if (null === $value)
         {
-          $array[$name] = $value;
+          continue;
+        }
+
+        $array[$name] = $value;
+      }
+    }
+
+    if ($withEmbeds && isset($this->data['embeds']))
+    {
+      foreach ($this->data['embeds'] as $name => $value)
+      {
+        if (null === $value)
+        {
+          continue;
+        }
+
+        // one
+        if ($value instanceof MondongoDocumentEmbed)
+        {
+          $array[$name] = $value->toArray();
+        }
+        // many
+        else
+        {
+          $arrayEmbed = array();
+          foreach ($value as $key => $element)
+          {
+            $arrayEmbed[$key] = $element->toArray();
+          }
+
+          $array[$name] = $arrayEmbed;
         }
       }
     }
@@ -522,8 +711,9 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
   protected function getMutators()
   {
     return array_merge(
-      array_keys(isset($this->data['fields']) ? $this->data['fields'] : array()),
-      array_keys(isset($this->data['references']) ? $this->data['references'] : array())
+      isset($this->data['fields']) ? array_keys($this->data['fields']) : array(),
+      isset($this->data['references']) ? array_keys($this->data['references']) : array(),
+      isset($this->data['embeds']) ? array_keys($this->data['embeds']) : array()
     );
   }
 

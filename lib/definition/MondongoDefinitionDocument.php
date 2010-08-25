@@ -46,8 +46,6 @@ class MondongoDefinitionDocument extends MondongoDefinition
 
   protected $collection;
 
-  protected $embeds = array();
-
   protected $relations = array();
 
   protected $extensions = array();
@@ -109,13 +107,6 @@ class MondongoDefinitionDocument extends MondongoDefinition
   protected function generateDefaultData()
   {
     $data = parent::generateDefaultData();
-
-    // embeds
-    $data['embeds'] = array();
-    foreach (array_keys($this->getEmbeds()) as $name)
-    {
-      $data['embeds'][$name] = null;
-    }
 
     // relations
     $data['relations'] = array();
@@ -199,66 +190,6 @@ class MondongoDefinitionDocument extends MondongoDefinition
   public function getCollection()
   {
     return null !== $this->collection ? $this->collection : MondongoInflector::underscore($this->getName());
-  }
-
-  /*
-   * Add an embed.
-   *
-   * @param string $name  The embed name.
-   * @param array  $embed The embed definition.
-   *
-   * @return MondongoDefinitionDocument The current instance.
-   *
-   * @throws LogicException If the name is busy.
-   */
-  public function embed($name, array $embed)
-  {
-    $this->checkName($name);
-
-    $this->embeds[$name] = $embed;
-
-    return $this;
-  }
-
-  /**
-   * Returns if an embed exists.
-   *
-   * @param string $name The embed name.
-   *
-   * @return boolean Returns if the embed exists.
-   */
-  public function hasEmbed($name)
-  {
-    return isset($this->embeds[$name]);
-  }
-
-  /**
-   * Return the embeds definitions.
-   *
-   * @return array The embeds definitions.
-   */
-  public function getEmbeds()
-  {
-    return $this->embeds;
-  }
-
-  /**
-   * Return an embed definition.
-   *
-   * @param string $name The embed name.
-   *
-   * @return array The embed definition.
-   *
-   * @throws InvalidArgumentException If the embed does not exists.
-   */
-  public function getEmbed($name)
-  {
-    if (!$this->hasEmbed($name))
-    {
-      throw new InvalidArgumentException(sprintf('The embed "%s" does not exists.', $name));
-    }
-
-    return $this->embeds[$name];
   }
 
   /**
@@ -376,8 +307,6 @@ class MondongoDefinitionDocument extends MondongoDefinition
   {
     return
       parent::doCheckName($name)
-      ||
-      $this->hasEmbed($name)
       ||
       $this->hasRelation($name)
     ;

@@ -33,42 +33,6 @@ class MondongoDocumentTest extends MondongoTestCase
     $this->assertSame($this->mondongo->getRepository('Article'), $article->getRepository());
   }
 
-  public function testModifiedEmbedOne()
-  {
-    $article = new Article();
-    $article->clearFieldsModified();
-
-    $source = new Source();
-    $article->set('source', $source);
-
-    $this->assertFalse($article->isModified());
-
-    $source->set('title', 'Ups');
-    $this->assertTrue($article->isModified());
-
-    $article->clearModified();
-    $this->assertFalse($article->isModified());
-    $this->assertFalse($source->isModified());
-  }
-
-  public function testModifiedEmbedMany()
-  {
-    $article = new Article();
-    $article->clearFieldsModified();
-
-    $comments = new MondongoGroup(array($comment = new Comment()));
-    $article->set('comments', $comments);
-
-    $this->assertFalse($article->isModified());
-
-    $comment->set('name', 'Ups');
-    $this->assertTrue($article->isModified());
-
-    $article->clearModified();
-    $this->assertFalse($article->isModified());
-    $this->assertFalse($comment->isModified());
-  }
-
   public function testNew()
   {
     $article = new Article();
@@ -146,61 +110,28 @@ class MondongoDocumentTest extends MondongoTestCase
     $this->assertSame(array('$set' => array('is_active' => false)), $article->getQueryForSave());
   }
 
-  public function testEmbedsOne()
+  public function testQueryForSaveWithEmbeds()
   {
-    $article = new Article();
+    $user = new User();
+    $user->fromArray($result = array(
+      'username' => 'pablodip',
+      'profile' => array(
+        'first_name' => 'Pablo',
+        'last_name'  => 'Díez',
+        'contacts' => array(
+          array(
+            'address'     => 'Address 1',
+            'phonenumber' => '111',
+          ),
+          array(
+            'address'     => 'Address 2',
+            'phonenumber' => '222',
+          )
+        ),
+      ),
+    ));
 
-    $source = $article->get('source');
-    $this->assertEquals('Source', get_class($source));
-    $this->assertSame($source, $article->get('source'));
-
-    $article = new Article();
-
-    $source = new Source();
-    $article->set('source', $source);
-    $this->assertSame($source, $article->get('source'));
-  }
-
-  /**
-   * @expectedException InvalidArgumentException
-   */
-  public function testEmbedsOneInvalidClass()
-  {
-    $article = new Article();
-    $article->set('source', new Category());
-  }
-
-  public function testEmbedsMany()
-  {
-    $article = new Article();
-
-    $comments = $article->get('comments');
-    $this->assertEquals('MondongoGroup', get_class($comments));
-    $this->assertSame($comments, $article->get('comments'));
-
-    $article = new Article();
-
-    $comments = new MondongoGroup(array(new Comment(), new Comment()));
-    $article->set('comments', $comments);
-    $this->assertSame($comments, $article->get('comments'));
-  }
-
-  /**
-   * @expectedException InvalidArgumentException
-   */
-  public function testEmbedsManyInvalidGroup()
-  {
-    $article = new Article();
-    $article->set('comments', array(new Comment()));
-  }
-
-  /**
-   * @expectedException InvalidArgumentException
-   */
-  public function testEmbedsManyInvalidClass()
-  {
-    $article = new Article();
-    $article->set('comments', new MondongoGroup(array(new Comment(), new DateTime())));
+    $this->assertEquals($result, $user->getQueryForSave());
   }
 
   public function testRelationsOne()
