@@ -144,8 +144,10 @@ abstract class MondongoDocument extends MondongoDocumentBase
     // embeds
     if (isset($this->data['embeds']))
     {
-      foreach ($this->data['embeds'] as $name => $embed)
+      foreach (array_keys($this->data['embeds']) as $name)
       {
+        $embed = $this->get($name);
+
         if (null !== $embed)
         {
           $value = $this->queryForSaveEmbed($embed);

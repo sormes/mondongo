@@ -54,10 +54,19 @@ class MondongoDocumentTest extends MondongoTestCase
   public function testQueryForSave()
   {
     $article = new Article();
-    $this->assertSame(array('is_active' => false), $article->getQueryForSave());
+    $this->assertSame(array(
+      'is_active' => false,
+      'source'    => array(),
+      'comments'  => array(),
+    ), $article->getQueryForSave());
 
     $article->set('options', $options = array('foo' => 'bar'));
-    $this->assertSame(array('is_active' => false, 'options' => serialize($options)), $article->getQueryForSave());
+    $this->assertSame(array(
+      'is_active' => false,
+      'options'   => serialize($options),
+      'source'    => array(),
+      'comments'  => array(),
+    ), $article->getQueryForSave());
 
     $source = new Source();
     $source->set('title', 'Foo');
@@ -101,13 +110,28 @@ class MondongoDocumentTest extends MondongoTestCase
 
     $this->assertSame(array(
       '$unset' => array('title' => 1),
+      '$set'   => array(
+        'source'   => array(),
+        'comments' => array(),
+      ),
     ), $article->getQueryForSave());
 
     $article = $this->mondongo->find('Article', array('query' => array('_id' => $article->getId()), 'fields' => array('title' => 1), 'one' => true));
-    $this->assertSame(array(), $article->getQueryForSave());
+    $this->assertSame(array(
+      '$set' => array(
+      'source'   => array(),
+      'comments' => array(),
+      ),
+    ), $article->getQueryForSave());
 
     $article->set('is_active', false);
-    $this->assertSame(array('$set' => array('is_active' => false)), $article->getQueryForSave());
+    $this->assertSame(array(
+      '$set' => array(
+        'is_active' => false,
+        'source'    => array(),
+        'comments'  => array(),
+      )
+    ), $article->getQueryForSave());
   }
 
   public function testQueryForSaveWithEmbeds()

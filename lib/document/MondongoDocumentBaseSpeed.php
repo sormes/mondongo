@@ -177,10 +177,7 @@ abstract class MondongoDocumentBaseSpeed implements ArrayAccess
 
     if ($data)
     {
-      foreach ($data as $name => $value)
-      {
-        $this->doSet($name, $value);
-      }
+      $this->fromArray($data);
     }
 
     // PERFORMANCE
