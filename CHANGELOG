@@ -1,0 +1,20 @@
+27/08/2010 - Version 0.9.1
+--------------------------
+
+ * [3b52222] updated MondongoDocumentSpeed
+ * [9e0ccd1] saved default data in embeds
+ * [dae9d64] simplified code in inModified function in documents (thanks ibolmo)
+ * [34bcd14] simplified code when save embeds (by ibolmo :)
+ * [6375643] allow deep embeds
+ * [01bb6de] added tests for queryForSave in documents without all fields selected in find
+ * [c5a6840] fixed find and findOne of Mondongo and added remove and tests
+ * [a71f81c] deleted MondongoGroup interface, now is the class for groups
+ * [097c92b] change the find and remove functions of repository for be more flexible; added also the ability to select fields explicitly
+ * [e568803] adding more phpdoc
+ * [6b235c4] adding phpdoc
+ * [5dd3715] fixed pear package generation
+
+03/08/2010 - Version 0.9.0
+--------------------------
+
+ * Initial version
